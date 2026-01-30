@@ -1,0 +1,27 @@
+# Optional YAML config (overridden by .env). Keys match .env names.
+# Data source selection
+USE_GOOGLE_SHEETS: false
+GSHEET_SPREADSHEET_ID:
+GSHEET_SERVICE_ACCOUNT_JSON: ./credentials/service_account.json
+
+# Excel fallback (when USE_GOOGLE_SHEETS=false)
+EXCEL_PATH: ./data/ideas.xlsx
+SHEET_NAME: Sheet1
+
+BACKGROUND_VIDEO: ./assets/background.mp4
+OUTPUT_DIR: ./outputs
+FONT_PATH: ./assets/fonts/NotoSerifCJKjp-Regular.otf
+
+default_platforms: youtube
+
+# Optional path to ffmpeg executable. If omitted, system PATH is used.
+FFMPEG_PATH: 
+
+YOUTUBE_CLIENT_SECRETS: ./credentials/client_secrets.json
+YOUTUBE_TOKEN_PATH: ./credentials/token.json
+
+DEFAULT_STATUS_READY: Ready
+DEFAULT_STATUS_DONE: Done
+DEFAULT_PRIVACY_STATUS: private
+DEFAULT_CATEGORY_ID: "22"
+DEFAULT_MADE_FOR_KIDS: false
