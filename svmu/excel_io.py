@@ -3,9 +3,9 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import List, Optional
-from openpyxl import load_workbook
 
 import pandas as pd
+from openpyxl import load_workbook
 
 DEFAULT_COLUMNS = [
     "id",
@@ -72,7 +72,7 @@ class ExcelStore:
             status_done: str = "Done",
             output_filename: Optional[str] = None,
             output_datetime: Optional[str] = None,
-    ) -> None:
+    ) -> bool:
         # openpyxl で既存ブックを開く（書式を保持）
         wb = load_workbook(self.excel_path)
         ws = wb[self.sheet_name] if self.sheet_name else wb.active
@@ -114,4 +114,8 @@ class ExcelStore:
             # cell.number_format = "yyyy/mm/dd hh:mm:ss"
 
         # 5) 保存
-        wb.save(self.excel_path)
+        try:
+            wb.save(self.excel_path)
+            return True
+        except Exception as e:
+            return False

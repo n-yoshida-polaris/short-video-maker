@@ -115,9 +115,14 @@ def main():
         if success:
             # Mark as Done and record filenames and timestamp
             ts = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-            store.write_status(row_index=idea.idx, status_done=cfg.status_done, output_filename=base_name, output_datetime=ts)
+            success = store.write_status(
+                row_index=idea.idx,
+                status_done=cfg.status_done,
+                output_filename=base_name,
+                output_datetime=ts)
             processed += 1
-        else:
+
+        if not success:
             print("[WARN] Processing failed; Excel/Sheet not updated.")
 
     print(f"\n[DONE] Processed {processed} rows (limit={args.limit}).")

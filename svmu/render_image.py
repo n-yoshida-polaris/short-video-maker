@@ -11,6 +11,7 @@ SAFE_MARGIN = 100  # px
 TITLE_FONT_SIZE = 92
 BULLET_FONT_SIZE = 48
 LINE_SPACING = 1.3  # multiplier
+BULLET_LINE_SPACING = 1.6  # multiplier for bullet lines
 BULLET_PREFIX = ""
 TITLE_COLOR = (255, 255, 255, 255)
 TEXT_COLOR = (255, 255, 255, 255)
@@ -121,7 +122,7 @@ class Renderer:
 
         # Compute total height to vertically center in remaining space
         line_heights = [self._measure(draw, line, self.text_font)[1] for line in bullet_lines]
-        total_h = sum(int(h * LINE_SPACING) for h in line_heights)
+        total_h = sum(int(h * BULLET_LINE_SPACING) for h in line_heights)
         remaining_top = max(y + SAFE_MARGIN, 0)
         # Start bullets 300px higher than the previous centered position
         start_y = (remaining_top + (CANVAS_H - remaining_top - SAFE_MARGIN - total_h) // 2) - 300
@@ -134,7 +135,7 @@ class Renderer:
             # Shadow
             draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=TEXT_SHADOW)
             draw.text((x, y2), line, font=self.text_font, fill=TEXT_COLOR)
-            y2 += int(lh * LINE_SPACING)
+            y2 += int(lh * BULLET_LINE_SPACING)
 
         return img
 
