@@ -1,0 +1,23 @@
+# Sample channel config (copy to channels/your_channel.yaml and edit)
+# You can override any keys from config.yaml.example here.
+
+# Data source (Google Sheets example)
+USE_GOOGLE_SHEETS: true
+GSHEET_SPREADSHEET_ID: "YOUR_SHEET_ID"
+GSHEET_SERVICE_ACCOUNT_JSON: ./credentials/service_account.json
+SHEET_NAME: シート1
+
+# Excel alternative (set USE_GOOGLE_SHEETS: false)
+EXCEL_PATH: ./assets/ideas.xlsx
+
+# Rendering / IO
+BACKGROUND_VIDEO: ./assets/backgrounds/bg1.mp4
+OUTPUT_DIR: ./outputs/your_channel
+FONT_PATH: ./assets/fonts/yu-mincho-demibold.ttf
+
+# ffmpeg (optional absolute path)
+FFMPEG_PATH: ./assets/ffmpeg.exe
+
+# Status words
+DEFAULT_STATUS_READY: Ready
+DEFAULT_STATUS_DONE: Done
