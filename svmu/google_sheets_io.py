@@ -63,7 +63,7 @@ class GoogleSheetStore:
         self._ensure_columns(DEFAULT_COLUMNS)
 
         # Read all records
-        records = self._ws.get_all_records(numericise_false=True)
+        records = self._ws.get_all_records(numericise_ignore=["all"])
         df = pd.DataFrame.from_records(records)
         # Guarantee all default columns exist and fill NAs
         for col in DEFAULT_COLUMNS:
@@ -107,6 +107,7 @@ class GoogleSheetStore:
         self._ensure_columns(DEFAULT_COLUMNS)
         # Figure column positions (0-based)
         self._read_header()
+
         def col_to_a1(col_idx_zero_based: int) -> str:
             col_num = col_idx_zero_based + 1
             letters = ""
@@ -136,4 +137,5 @@ class GoogleSheetStore:
         # Apply updates (simple per-cell updates for compatibility)
         if updates:
             for a1, val in updates.items():
-                self._ws.update(a1, val)
+                # google spread sheet は 2次配列で値を更新
+                self._ws.update(a1, [[val]])

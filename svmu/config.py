@@ -16,12 +16,10 @@ class AppConfig:
     output_dir: str
     font_path: Optional[str]
     ffmpeg_path: Optional[str]
-
     # Google Sheets
     use_google_sheets: bool
     gsheet_spreadsheet_id: Optional[str]
     gsheet_service_account_json: Optional[str]
-
     status_ready: str
     status_done: str
 
@@ -41,7 +39,7 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
 
     def get(name: str, default: Optional[str] = None):
         # YAML を優先し、無ければ環境変数、最後にデフォルト
-        return cfg_yaml.get(name, os.getenv(name, default))
+        return os.getenv(name, default) if cfg_yaml.get(name) is None else cfg_yaml.get(name)
 
     # 設定を返す
     return AppConfig(

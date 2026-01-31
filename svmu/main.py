@@ -96,11 +96,11 @@ def main():
             sheet_name=sheet_name,
             service_account_json=cfg.gsheet_service_account_json or "./credentials/service_account.json",
         )
-        print(f"[INFO] Using Google Sheets spreadsheet_id={cfg.gsheet_spreadsheet_id} sheet={sheet_name or 'sheet1'}")
     else:
         store = ExcelStore(excel_path=excel_path, sheet_name=sheet_name)
         print(f"[INFO] Using Excel file: {excel_path} sheet={sheet_name or '(default)'}")
 
+    # 準備中のみ取得
     rows = store.read_ready(status_ready=cfg.status_ready)
 
     if not rows:

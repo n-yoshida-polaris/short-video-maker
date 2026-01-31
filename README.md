@@ -1,17 +1,18 @@
 # Linux での仮想環境 (venv) 構築手順
 
-本プロジェクトは venv を使って開発環境を構築します。以下は Linux (Ubuntu/Debian 系を想定) での基本的な手順です。
+本プロジェクトは venv を使って開発環境を構築します。
+以下は Linux (Ubuntu/Debian 系を想定) での基本的な手順です。
 
 1) 事前準備
-   - Python3 がインストールされていることを確認
-     ```bash
-     python3 --version
-     ```
-   - 必要であれば venv パッケージをインストール（Ubuntu/Debian）
-     ```bash
-     sudo apt update
-     sudo apt install -y python3-venv
-     ```
+    - Python3 がインストールされていることを確認
+      ```bash
+      python3 --version
+      ```
+    - 必要であれば venv パッケージをインストール（Ubuntu/Debian）
+      ```bash
+      sudo apt update
+      sudo apt install -y python3-venv
+      ```
 
 2) 仮想環境の作成（プロジェクト直下に .venv を作成）
    ```bash
@@ -22,7 +23,7 @@
    ```bash
    source .venv/bin/activate
    ```
-   - 有効化後、プロンプトに `(venv)` が表示されます。
+    - 有効化後、プロンプトに `(venv)` が表示されます。
 
 4) 依存関係のインストール
    ```bash
@@ -34,10 +35,10 @@
    ```bash
    python -m svmu.main --sheet "Sheet1" --output ./outputs --limit 5
    ```
-   - Excel を使う場合は `.env` で `USE_GOOGLE_SHEETS=false` を設定し、
-     ```bash
-     python -m svmu.main --excel "./assets/ideas.xlsx" --sheet "Sheet1" --output ./outputs --limit 5
-     ```
+    - Excel を使う場合は `.env` で `USE_GOOGLE_SHEETS=false` を設定し、
+      ```bash
+      python -m svmu.main --excel "./assets/ideas.xlsx" --sheet "Sheet1" --output ./outputs --limit 5
+      ```
 
 6) 仮想環境の無効化
    ```bash
@@ -45,6 +46,7 @@
    ```
 
 補足:
+
 - `.venv/` は既に `.gitignore` に含まれており、リポジトリにコミットされません。
 - 他ディストリビューションでも基本は同様です。`python3-venv` パッケージ名は環境により異なることがあります。
 
@@ -91,14 +93,14 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
     - `output_filename`（任意; 拡張子なし）: 出力ファイル名のベース（拡張子を除く）。自動生成後に書き込まれます。
     - `output_datetime`（任意; 文字列）: 出力日時。`yyyy/mm/dd hh:mm:ss` 形式のローカル時刻が自動で書き込まれます。
 
-    参考: 列は Excel/Google スプレッドシートのどちらでも同一名称で扱われます。既存ブックの書式（列幅・改行など）は保持され、値のみ更新します。
+   参考: 列は Excel/Google スプレッドシートのどちらでも同一名称で扱われます。既存ブックの書式（列幅・改行など）は保持され、値のみ更新します。
 
-    サンプル（MDテーブル形式）:
+   サンプル（MDテーブル形式）:
 
-    | id | title | bullets | tags | description | status | output_filename | output_datetime |
-    |---:|:------|:--------|:-----|:------------|:-------|:----------------|:----------------|
-    | 1 | 老後貧乏を招く 50代の思考 | ・貯蓄よりまず収支見直し\n・固定費の削減から\n・投資は小さく始める | 家計,投資 | 家計見直しの基本 | Ready |  |  |
-    | 2 | いますぐ始める英語学習3ステップ | ・毎日5分の音読\n・1フレーズ暗記\n・週末に復習 | 学習 | 習慣化のコツ | Done | 2_いますぐ始める英語学習3ステップ | 2026/01/31 14:20:05 |
+   | id | title            | bullets                             | tags  | description | status | output_filename    | output_datetime     |
+      |---:|:-----------------|:------------------------------------|:------|:------------|:-------|:-------------------|:--------------------|
+   |  1 | 老後貧乏を招く 50代の思考   | ・貯蓄よりまず収支見直し\n・固定費の削減から\n・投資は小さく始める | 家計,投資 | 家計見直しの基本    | Ready  |                    |                     |
+   |  2 | いますぐ始める英語学習3ステップ | ・毎日5分の音読\n・1フレーズ暗記\n・週末に復習          | 学習    | 習慣化のコツ      | Done   | 2_いますぐ始める英語学習3ステップ | 2026/01/31 14:20:05 |
 
 6. 背景動画（mp4）を用意し、`.env` の `BACKGROUND_VIDEO` にパスを設定します。
 
@@ -116,6 +118,3 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
 
 - ログ: 標準出力に表示。将来的にファイル/JSONログ対応を検討しています。
 
-## ライセンス
-
-MIT
