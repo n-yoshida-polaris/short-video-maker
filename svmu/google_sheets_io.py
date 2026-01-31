@@ -90,13 +90,21 @@ class GoogleSheetStore:
                     description=str(r.get("description", "")).strip() or None,
                     status=str(r.get("status", "")).strip(),
                     output_filename=str(r.get("output_filename", "")).strip() or None,
+                    output_datetime=str(r.get("output_datetime", "")).strip() or None,
                 )
             )
         # Keep original df for later writes
         self._df = df
         return rows
 
-    def write_status(self, row_index: int, status_done: str = "Done") -> None:
+    def write_status(
+            self,
+            row_index: int,
+            status_done: str = "Done",
+            output_filename: Optional[str] = None,
+            output_datetime: Optional[str] = None) -> None:
+        # Ensure required columns exist
+        self._ensure_columns(DEFAULT_COLUMNS)
         # Figure column positions (0-based)
         self._read_header()
         def col_to_a1(col_idx_zero_based: int) -> str:
@@ -114,6 +122,16 @@ class GoogleSheetStore:
         status_col_idx = self._col_idx("status")
         if status_col_idx is not None:
             updates[f"{col_to_a1(status_col_idx)}{rownum}"] = status_done
+        # output_filename
+        if output_filename is not None:
+            of_col_idx = self._col_idx("output_filename")
+            if of_col_idx is not None:
+                updates[f"{col_to_a1(of_col_idx)}{rownum}"] = output_filename
+        # output_datetime
+        if output_datetime is not None:
+            od_col_idx = self._col_idx("output_datetime")
+            if od_col_idx is not None:
+                updates[f"{col_to_a1(od_col_idx)}{rownum}"] = output_datetime
 
         # Apply updates (simple per-cell updates for compatibility)
         if updates:

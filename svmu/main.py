@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+from datetime import datetime
 
 from svmu.compose_video import compose_with_overlay, ComposeError
 from svmu.config import load_config
@@ -19,9 +20,9 @@ def process_row(
         cfg,
         idea,
         out_dir: str
-) -> bool:
+) -> tuple[bool, str | None]:
     """
-    Returns (uploaded, results). results maps for each success.
+    Returns (success, base_name) where base_name is the file stem used for outputs.
     """
     print(f"\n[INFO] Processing id={idea.id} title={idea.title!r}")
 
@@ -55,16 +56,16 @@ def process_row(
         )
     except FileNotFoundError as e:
         print(f"[ERROR] File not exist: {e} {e.filename}")
-        return False
+        return False, None
     except ComposeError as e:
         print(f"[ERROR] Compose failed: {e}")
-        return False
+        return False, None
 
     print(f"[OK] Video composed: {video_out}")
 
     # 3) Upload step removed: skip uploads and return compose success only
     print("[INFO] Upload step is disabled; only rendering and composition are performed.")
-    return True
+    return True, base_name
 
 
 def main():
@@ -110,13 +111,14 @@ def main():
     for idea in rows:
         if processed >= args.limit:
             break
-        results = process_row(cfg, idea, out_dir)
-        if results:
-            # Upload phase removed: mark as Done with timestamp only.
-            store.write_status(row_index=idea.idx, status_done=cfg.status_done)
+        success, base_name = process_row(cfg, idea, out_dir)
+        if success:
+            # Mark as Done and record filenames and timestamp
+            ts = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            store.write_status(row_index=idea.idx, status_done=cfg.status_done, output_filename=base_name, output_datetime=ts)
             processed += 1
         else:
-            print("[WARN] Processing failed; Excel not updated.")
+            print("[WARN] Processing failed; Excel/Sheet not updated.")
 
     print(f"\n[DONE] Processed {processed} rows (limit={args.limit}).")
 

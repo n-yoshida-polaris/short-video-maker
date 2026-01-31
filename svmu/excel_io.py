@@ -14,6 +14,7 @@ DEFAULT_COLUMNS = [
     "description",
     "status",
     "output_filename",
+    "output_datetime",
 ]
 
 
@@ -27,6 +28,7 @@ class IdeaRow:
     description: Optional[str]
     status: str
     output_filename: Optional[str]
+    output_datetime: Optional[str]
 
 
 class ExcelStore:
@@ -55,23 +57,30 @@ class ExcelStore:
                     tags=str(r["tags"]).strip() or None,
                     description=str(r["description"]).strip() or None,
                     status=str(r["status"]).strip(),
-                    output_filename=str(r["output_filename"]).strip() or None
+                    output_filename=str(r["output_filename"]).strip() or None,
+                    output_datetime=str(r["output_datetime"]).strip() or None,
                 )
             )
         # Keep original df for later writes
         self._df = df
         return rows
 
-    def write_status(self, row_index: int, status_done: str = "Done") -> None:
+    def write_status(self, row_index: int, status_done: str = "Done", output_filename: Optional[str] = None, output_datetime: Optional[str] = None) -> None:
         if not hasattr(self, "_df"):
             # Lazy-load if not present
             self._df = pd.read_excel(self.excel_path, sheet_name=self.sheet_name)
         df = self._df
-        if "status" not in df.columns:
-            df["status"] = ""
+        # Ensure columns exist
+        for col in DEFAULT_COLUMNS:
+            if col not in df.columns:
+                df[col] = ""
 
-        # Update status
+        # Update fields
         df.at[row_index, "status"] = status_done
+        if output_filename is not None:
+            df.at[row_index, "output_filename"] = output_filename
+        if output_datetime is not None:
+            df.at[row_index, "output_datetime"] = output_datetime
 
         # Save back to the same sheet
         if self.sheet_name:
