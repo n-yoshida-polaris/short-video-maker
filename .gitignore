@@ -15,7 +15,5 @@ Thumbs.db
 /credentials/*
 config.yaml
 
-# assets
-/assets/ffmpeg.exe
 
 .idea/
