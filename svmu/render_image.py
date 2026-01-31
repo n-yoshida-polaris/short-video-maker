@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import os
 from typing import Tuple, List, Optional
-from PIL import Image, ImageDraw, ImageFont
 
+from PIL import Image, ImageDraw, ImageFont
 
 CANVAS_W = 1080
 CANVAS_H = 1920
@@ -60,7 +60,8 @@ class Renderer:
                 return font.getsize(text)
             except Exception:
                 # As a last resort, approximate by length
-                return (len(text) * (font.size if hasattr(font, 'size') else 10), font.size if hasattr(font, 'size') else 10)
+                return (len(text) * (font.size if hasattr(font, 'size') else 10),
+                        font.size if hasattr(font, 'size') else 10)
 
     def _wrap_text(self, text: str, font: ImageFont.ImageFont, max_width: int, draw: ImageDraw.ImageDraw) -> List[str]:
         # Handle Japanese by measuring by character; break on \n or when width exceeds
@@ -92,7 +93,7 @@ class Renderer:
 
         # Title at top (shifted 100px lower)
         title_lines = self._wrap_text(title, self.title_font, max_text_w, draw)
-        y = SAFE_MARGIN + 230
+        y = SAFE_MARGIN + 100
         for line in title_lines:
             # Shadow
             tw, th = self._measure(draw, line, self.title_font)

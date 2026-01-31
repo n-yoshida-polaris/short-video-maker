@@ -1,27 +1,23 @@
-# Optional YAML config (overridden by .env). Keys match .env names.
-# Data source selection
+# Data source
+# If you want to use Google Sheets, set USE_GOOGLE_SHEETS=true and provide the spreadsheet ID
+# and the path to a Google Cloud service account JSON key. Share the sheet with that service account email.
 USE_GOOGLE_SHEETS: false
 GSHEET_SPREADSHEET_ID:
 GSHEET_SERVICE_ACCOUNT_JSON: ./credentials/service_account.json
 
-# Excel fallback (when USE_GOOGLE_SHEETS=false)
-EXCEL_PATH: ./data/ideas.xlsx
+# Excel fallback (used when USE_GOOGLE_SHEETS=false)
+EXCEL_PATH: ./assets/ideas.xlsx
 SHEET_NAME: Sheet1
 
+# BACKGROUND_VIDEO can be a single mp4 file or a directory containing multiple mp4 files.
+# If a directory is specified, one mp4 will be chosen at random per compose.
 BACKGROUND_VIDEO: ./assets/background.mp4
 OUTPUT_DIR: ./outputs
 FONT_PATH: ./assets/fonts/NotoSerifCJKjp-Regular.otf
 
-default_platforms: youtube
+# Optional: absolute path to ffmpeg executable. If unset, system PATH will be used.
+FFMPEG_PATH:
 
-# Optional path to ffmpeg executable. If omitted, system PATH is used.
-FFMPEG_PATH: 
-
-YOUTUBE_CLIENT_SECRETS: ./credentials/client_secrets.json
-YOUTUBE_TOKEN_PATH: ./credentials/token.json
-
+# Defaults
 DEFAULT_STATUS_READY: Ready
 DEFAULT_STATUS_DONE: Done
-DEFAULT_PRIVACY_STATUS: private
-DEFAULT_CATEGORY_ID: "22"
-DEFAULT_MADE_FOR_KIDS: false

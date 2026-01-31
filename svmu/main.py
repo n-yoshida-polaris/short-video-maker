@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import argparse
 import os
-from datetime import datetime
-from typing import List
 
 from svmu.compose_video import compose_with_overlay, ComposeError
 from svmu.config import load_config
@@ -20,11 +18,10 @@ def ensure_dirs(path: str):
 def process_row(
         cfg,
         idea,
-        out_dir: str,
-        platforms: List[str],
+        out_dir: str
 ) -> bool:
     """
-    Returns (uploaded, results). results maps platform -> url for each success.
+    Returns (uploaded, results). results maps for each success.
     """
     print(f"\n[INFO] Processing id={idea.id} title={idea.title!r}")
 
@@ -51,7 +48,6 @@ def process_row(
             background_video=cfg.background_video,
             overlay_png=overlay_path,
             output_path=video_out,
-            duration_sec=idea.video_duration_sec,
             video_codec="libx264",
             crf=20,
             preset="medium",
@@ -76,8 +72,6 @@ def main():
     parser.add_argument("--excel", dest="excel_path", default=None, help="Path to Excel .xlsx")
     parser.add_argument("--sheet", dest="sheet_name", default=None, help="Sheet name")
     parser.add_argument("--output", dest="output_dir", default=None, help="Output directory")
-    parser.add_argument("--platform", dest="platforms", default=None,
-                        help="Comma separated platforms (youtube,tiktok,instagram)")
     parser.add_argument("--limit", dest="limit", type=int, default=10, help="Max rows to process")
     parser.add_argument("--config", dest="config_yaml", default=None, help="Optional config.yaml path")
 
@@ -89,10 +83,6 @@ def main():
     excel_path = args.excel_path or cfg.excel_path
     sheet_name = args.sheet_name or cfg.sheet_name
     out_dir = args.output_dir or cfg.output_dir
-
-    # Determine platforms from CLI or from row-specific field or from default config later
-    default_platforms = [p.strip().lower() for p in (args.platforms or ",".join(cfg.default_platforms)).split(",") if
-                         p.strip()]
 
     ensure_dirs(out_dir)
 
@@ -120,23 +110,10 @@ def main():
     for idea in rows:
         if processed >= args.limit:
             break
-
-        # Per-row platforms override
-        row_platforms = default_platforms
-        if idea.platforms:
-            row_platforms = [p.strip().lower() for p in idea.platforms.split(",") if p.strip()]
-
-        results = process_row(cfg, idea, out_dir, row_platforms)
-
+        results = process_row(cfg, idea, out_dir)
         if results:
-            now = datetime.now()
             # Upload phase removed: mark as Done with timestamp only.
-            store.write_uploaded(
-                row_index=idea.idx,
-                status_done=cfg.status_done,
-                upload_url=None,
-                uploaded_at=now,
-            )
+            store.write_status(row_index=idea.idx, status_done=cfg.status_done)
             processed += 1
         else:
             print("[WARN] Processing failed; Excel not updated.")

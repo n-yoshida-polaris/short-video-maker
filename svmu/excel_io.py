@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from datetime import datetime
 from typing import List, Optional
 
 import pandas as pd
@@ -15,11 +14,6 @@ DEFAULT_COLUMNS = [
     "description",
     "status",
     "output_filename",
-    "platforms",
-    "video_duration_sec",
-    # Legacy (kept for backward compatibility)
-    "upload_url",
-    "uploaded_at",
 ]
 
 
@@ -33,8 +27,6 @@ class IdeaRow:
     description: Optional[str]
     status: str
     output_filename: Optional[str]
-    platforms: Optional[str]
-    video_duration_sec: Optional[int]
 
 
 class ExcelStore:
@@ -63,65 +55,23 @@ class ExcelStore:
                     tags=str(r["tags"]).strip() or None,
                     description=str(r["description"]).strip() or None,
                     status=str(r["status"]).strip(),
-                    output_filename=str(r["output_filename"]).strip() or None,
-                    platforms=str(r["platforms"]).strip() or None,
-                    video_duration_sec=int(r["video_duration_sec"]) if str(
-                        r["video_duration_sec"]).strip().isdigit() else None,
+                    output_filename=str(r["output_filename"]).strip() or None
                 )
             )
         # Keep original df for later writes
         self._df = df
         return rows
 
-    def write_uploaded(
-            self,
-            row_index: int,
-            status_done: str = "Done",
-            upload_url: Optional[str] = None,
-            uploaded_at: Optional[datetime] = None,
-            platform: Optional[str] = None,
-    ) -> None:
+    def write_status(self, row_index: int, status_done: str = "Done") -> None:
         if not hasattr(self, "_df"):
             # Lazy-load if not present
             self._df = pd.read_excel(self.excel_path, sheet_name=self.sheet_name)
         df = self._df
         if "status" not in df.columns:
             df["status"] = ""
-        # Ensure legacy columns exist for backward compatibility
-        if "upload_url" not in df.columns:
-            df["upload_url"] = ""
-        if "uploaded_at" not in df.columns:
-            df["uploaded_at"] = ""
-
-        # Ensure per-platform columns if platform provided
-        platform = (platform or "").strip().lower() or None
-        if platform in {"youtube", "tiktok", "instagram"}:
-            url_col = f"{platform}_upload_url"
-            at_col = f"{platform}_uploaded_at"
-            if url_col not in df.columns:
-                df[url_col] = ""
-            if at_col not in df.columns:
-                df[at_col] = ""
-        else:
-            url_col = None
-            at_col = None
 
         # Update status
         df.at[row_index, "status"] = status_done
-
-        # Write URLs and timestamps
-        if upload_url:
-            if url_col:
-                df.at[row_index, url_col] = upload_url
-            # Also keep legacy filled for first success (mainly YouTube) for compatibility
-            if not str(df.at[row_index, "upload_url"]).strip():
-                df.at[row_index, "upload_url"] = upload_url
-        if uploaded_at:
-            ts = uploaded_at.strftime("%Y-%m-%d %H:%M:%S")
-            if at_col:
-                df.at[row_index, at_col] = ts
-            if not str(df.at[row_index, "uploaded_at"]).strip():
-                df.at[row_index, "uploaded_at"] = ts
 
         # Save back to the same sheet
         if self.sheet_name:

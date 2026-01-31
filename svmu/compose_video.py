@@ -42,7 +42,6 @@ def compose_with_overlay(
         background_video: str,
         overlay_png: str,
         output_path: str,
-        duration_sec: Optional[int] = None,
         video_codec: str = "libx264",
         crf: int = 20,
         preset: str = "medium",
@@ -96,13 +95,10 @@ def compose_with_overlay(
 
     if fps:
         cmd += ["-r", str(fps)]
-    if duration_sec and duration_sec > 0:
-        cmd += ["-t", str(duration_sec)]
 
     cmd += [output_path]
 
     try:
-        print("##################################################")
         resolved = shutil.which(exe) if exe == "ffmpeg" else exe
         print(resolved)
         pprint(cmd)

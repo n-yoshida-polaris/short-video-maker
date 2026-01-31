@@ -32,11 +32,11 @@
 
 5) 動作確認（例）
    ```bash
-   python -m svmu.main --sheet "Sheet1" --output ./outputs --platform youtube --limit 5
+   python -m svmu.main --sheet "Sheet1" --output ./outputs --limit 5
    ```
    - Excel を使う場合は `.env` で `USE_GOOGLE_SHEETS=false` を設定し、
      ```bash
-     python -m svmu.main --excel "./data/ideas.xlsx" --sheet "Sheet1" --output ./outputs --platform youtube --limit 5
+     python -m svmu.main --excel "./assets/ideas.xlsx" --sheet "Sheet1" --output ./outputs --limit 5
      ```
 
 6) 仮想環境の無効化
@@ -89,26 +89,21 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
     - `description`（任意; 文字列）
     - `status`（文字列; `Ready` で処理対象。処理後は `Done` に更新）
     - `output_filename`（任意; 拡張子なし）
-    - `platforms`（任意; CSV: `youtube,tiktok,instagram`）
-    - `video_duration_sec`（任意; 整数秒）
-    - 互換: `upload_url`, `uploaded_at`（互換維持用。初回成功時に埋まります）
 
 6. 背景動画（mp4）を用意し、`.env` の `BACKGROUND_VIDEO` にパスを設定します。
 
 7. 実行（生成→合成→シート更新）:
     - Excel利用時:
       ```bash
-      python -m svmu.main --excel "$EXCEL_PATH" --sheet "Sheet1" --output ./outputs --platform youtube --limit 5
+      python -m svmu.main --excel "$EXCEL_PATH" --sheet "Sheet1" --output ./outputs --limit 5
       ```
     - Googleスプレッドシート利用時（`USE_GOOGLE_SHEETS=true` 設定済み）:
       ```bash
-      python -m svmu.main --sheet "Sheet1" --output ./outputs --platform youtube --limit 5
+      python -m svmu.main --sheet "Sheet1" --output ./outputs --limit 5
       ```
 
 ## 補足
 
-- 長さ: `video_duration_sec` が指定されている場合、出力は `min(背景動画の長さ, 指定秒数)` に切り詰められます。ループ再生は行いません。
-- TikTok / Instagram: これらのアップローダーは現状スタブです。実装されるまではスキップされます。
 - ログ: 標準出力に表示。将来的にファイル/JSONログ対応を検討しています。
 
 ## ライセンス

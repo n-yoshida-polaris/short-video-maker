@@ -12,8 +12,7 @@ Thumbs.db
 
 # Project
 /outputs/
-/resources/
-/credentials/
+/credentials/*
 config.yaml
 
 .idea/

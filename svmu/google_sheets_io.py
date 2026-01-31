@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass
-from datetime import datetime
 from typing import List, Optional, Dict
 
-import pandas as pd
 import gspread
+import pandas as pd
 
 # Reuse shared schema and dataclass from excel_io to keep one source of truth
 from .excel_io import DEFAULT_COLUMNS, IdeaRow
@@ -93,31 +90,13 @@ class GoogleSheetStore:
                     description=str(r.get("description", "")).strip() or None,
                     status=str(r.get("status", "")).strip(),
                     output_filename=str(r.get("output_filename", "")).strip() or None,
-                    platforms=str(r.get("platforms", "")).strip() or None,
-                    video_duration_sec=int(r.get("video_duration_sec")) if str(r.get("video_duration_sec", "")).strip().isdigit() else None,
                 )
             )
+        # Keep original df for later writes
+        self._df = df
         return rows
 
-    def write_uploaded(
-        self,
-        row_index: int,
-        status_done: str = "Done",
-        upload_url: Optional[str] = None,
-        uploaded_at: Optional[datetime] = None,
-        platform: Optional[str] = None,
-    ) -> None:
-        # Ensure legacy and per-platform columns exist
-        needed = ["status", "upload_url", "uploaded_at"]
-        p = _lower(platform)
-        url_col = None
-        at_col = None
-        if p in {"youtube", "tiktok", "instagram"}:
-            url_col = f"{p}_upload_url"
-            at_col = f"{p}_uploaded_at"
-            needed.extend([url_col, at_col])
-        self._ensure_columns(needed)
-
+    def write_status(self, row_index: int, status_done: str = "Done") -> None:
         # Figure column positions (0-based)
         self._read_header()
         def col_to_a1(col_idx_zero_based: int) -> str:
@@ -136,33 +115,7 @@ class GoogleSheetStore:
         if status_col_idx is not None:
             updates[f"{col_to_a1(status_col_idx)}{rownum}"] = status_done
 
-        # Per-platform and legacy URL
-        if upload_url:
-            if url_col is not None:
-                uidx = self._col_idx(url_col)
-                if uidx is not None:
-                    updates[f"{col_to_a1(uidx)}{rownum}"] = upload_url
-            # Fill legacy only if empty
-            uid_legacy = self._col_idx("upload_url")
-            if uid_legacy is not None:
-                # We need to read the current cell to check emptiness
-                current = self._ws.cell(rownum, uid_legacy + 1).value or ""
-                if not str(current).strip():
-                    updates[f"{col_to_a1(uid_legacy)}{rownum}"] = upload_url
-
-        if uploaded_at:
-            ts = uploaded_at.strftime("%Y-%m-%d %H:%M:%S")
-            if at_col is not None:
-                aidx = self._col_idx(at_col)
-                if aidx is not None:
-                    updates[f"{col_to_a1(aidx)}{rownum}"] = ts
-            aid_legacy = self._col_idx("uploaded_at")
-            if aid_legacy is not None:
-                current = self._ws.cell(rownum, aid_legacy + 1).value or ""
-                if not str(current).strip():
-                    updates[f"{col_to_a1(aid_legacy)}{rownum}"] = ts
-
         # Apply updates (simple per-cell updates for compatibility)
         if updates:
             for a1, val in updates.items():
-                self._ws.update(a1, [[val]])
+                self._ws.update(a1, val)
