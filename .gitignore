@@ -13,6 +13,7 @@ Thumbs.db
 # Project
 /outputs/
 /credentials/*
+/channels/
 config*.yaml
 
 # assets

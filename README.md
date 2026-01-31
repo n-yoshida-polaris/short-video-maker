@@ -115,6 +115,62 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
       python -m svmu.main --sheet "Sheet1" --output ./outputs --limit 5
       ```
 
+## マルチチャンネル運用（YAML をチャンネルごとに配置）
+
+複数のチャンネル設定を、プロジェクト直下の `channels/` ディレクトリに YAML として置き、まとめて順番に実行できます。
+
+- ディレクトリ: `./channels/`
+- ファイル: `*.yaml` または `*.yml`（例: `finance.yaml`, `english.yaml`）
+- サンプル: `channels/channel.sample.yaml`
+
+実行方法:
+
+```bash
+# 乾燥実行（一覧のみ）
+python -m svmu_multi.run --dry-run
+
+# 実行（見つかった YAML を順に実行）
+python -m svmu_multi.run
+
+# 1チャンネルあたりの最大処理件数を制限（例: 3件）
+python -m svmu_multi.run --limit 3
+
+# channels ディレクトリを変更
+python -m svmu_multi.run --channels-dir ./my_channels
+```
+
+各チャンネルの YAML は `config.yaml.example` と同じキーを上書きできます。例:
+
+```yaml
+USE_GOOGLE_SHEETS: true
+GSHEET_SPREADSHEET_ID: "YOUR_SHEET_ID"
+SHEET_NAME: シート1
+BACKGROUND_VIDEO: ./assets/backgrounds/bg1.mp4
+OUTPUT_DIR: ./outputs/finance
+DEFAULT_STATUS_READY: Ready
+DEFAULT_STATUS_DONE: Done
+```
+
+### 定期実行（cron / タスクスケジューラ）
+
+- Linux (cron):
+  ```cron
+  # 毎時 10分に全チャンネルを実行（venv を使う例）
+  10 * * * * cd /path/to/ShortVideoMaker && /path/to/venv/bin/python -m svmu_multi.run --limit 5 >> logs/multi.log 2>&1
+  ```
+
+- Windows (タスク スケジューラ):
+  - プログラム/スクリプト: `C:\\Path\\To\\python.exe`
+  - 引数の追加: `-m svmu_multi.run --limit 5`
+  - 開始 (作業) ディレクトリ: `E:\\002__DEV\\projects\\ShortVideoMaker`
+  - もしくは PowerShell で手動起動:
+    ```powershell
+    cd E:\002__DEV\projects\ShortVideoMaker
+    python -m svmu_multi.run --limit 5
+    ```
+
+注意: 各 YAML は個別に `OUTPUT_DIR` を変えておくと出力が混在しません。
+
 ## 補足
 
 - ログ: 標準出力に表示。将来的にファイル/JSONログ対応を検討しています。
