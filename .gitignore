@@ -13,7 +13,7 @@ Thumbs.db
 # Project
 /outputs/
 /credentials/*
-config.yaml
+config*.yaml
 
 # assets
 /assets/ffmpeg.exe
