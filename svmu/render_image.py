@@ -17,7 +17,7 @@ TITLE_FONT_SIZE = 92
 TITLE_LINE_SPACING = 1.3
 TITLE_X_ALIGN = "center"  # "center" or "left"
 TITLE_X = 90  # タイトル開始位置(左：絶対位置) Used when TITLE_X_ALIGN == "left"
-TITLE_Y = 250 # タイトル開始位置(上：絶対位置)
+TITLE_Y = 240 # タイトル開始位置(上：絶対位置)
 TITLE_COLOR = (255, 255, 255, 255)
 TITLE_SHADOW = (0, 0, 0, 180)
 
