@@ -125,11 +125,17 @@ class Renderer:
             y += int(th * TITLE_LINE_SPACING)
 
         # Bullets center area
-        bullet_text = bullets.replace("\r", "").strip()
+        bullet_text = bullets.replace("\r", "")
         if "\n" not in bullet_text and "・" in bullet_text:
+            # When using '・' delimiter, keep non-empty items only
             bullet_items = [s.strip() for s in bullet_text.split("・") if s.strip()]
         else:
-            bullet_items = [s.strip() for s in bullet_text.split("\n") if s.strip()]
+            # Preserve in-between empty lines, but drop trailing empty lines
+            tmp_items = [s.strip() for s in bullet_text.split("\n")]
+            # Remove empty lines at the end only
+            while tmp_items and tmp_items[-1] == "":
+                tmp_items.pop()
+            bullet_items = tmp_items
 
         bullet_lines: List[str] = []
         for item in bullet_items:
@@ -144,8 +150,15 @@ class Renderer:
         # Bullets at fixed position
         y2 = BULLET_Y
         for line in bullet_lines:
-            lw, lh = self._measure(draw, line, self.text_font)
             x = BULLET_X
+            # If the line is empty, create vertical spacing but don't draw text
+            if line == "":
+                base_h = getattr(self.text_font, "size", 12)
+                y2 += int(base_h * BULLET_LINE_SPACING)
+                continue
+            lw, lh = self._measure(draw, line, self.text_font)
+            if lh == 0:
+                lh = getattr(self.text_font, "size", 12)
             # Shadow
             draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=BULLET_SHADOW)
             draw.text((x, y2), line, font=self.text_font, fill=BULLET_COLOR)
