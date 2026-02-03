@@ -5,19 +5,37 @@ from typing import Tuple, List, Optional
 
 from PIL import Image, ImageDraw, ImageFont
 
+# 縦動画 縦横
 CANVAS_W = 1080
 CANVAS_H = 1920
-SAFE_MARGIN = 100  # px
+
+# Youtube や SNS 表示時に隠れるサイドの余白(px)
+SIDE_HIDDEN_MARGIN = 50
+
+# タイトル
 TITLE_FONT_SIZE = 92
-BULLET_FONT_SIZE = 48
-LINE_SPACING = 1.3  # multiplier
-BULLET_LINE_SPACING = 1.6  # multiplier for bullet lines
-BULLET_PREFIX = ""
+TITLE_LINE_SPACING = 1.3
+TITLE_X_ALIGN = "center"  # "center" or "left"
+TITLE_X = 90  # タイトル開始位置(左：絶対位置) Used when TITLE_X_ALIGN == "left"
+TITLE_Y = 250 # タイトル開始位置(上：絶対位置)
 TITLE_COLOR = (255, 255, 255, 255)
-TEXT_COLOR = (255, 255, 255, 255)
 TITLE_SHADOW = (0, 0, 0, 180)
-TEXT_SHADOW = (0, 0, 0, 160)
+
+# 本文
+BULLET_FONT_SIZE = 48
+BULLET_LINE_SPACING = 1.7
+BULLET_PREFIX = ""
+BULLET_X = 90   # 本文開始位置(左：絶対位置)
+BULLET_Y = 560  # 本文開始位置(上：絶対位置)
+BULLET_COLOR = (255, 255, 255, 255)
+BULLET_SHADOW = (0, 0, 0, 160)
+
+
+# 影設定
 SHADOW_OFFSET = (2, 2)
+
+# タイトルと本文の最大幅
+MAX_TEXT_W = 900
 
 
 class Renderer:
@@ -90,18 +108,21 @@ class Renderer:
         img = Image.new("RGBA", (CANVAS_W, CANVAS_H), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        max_text_w = CANVAS_W - SAFE_MARGIN * 2
+        max_text_w = MAX_TEXT_W
 
-        # Title at top (shifted 100px lower)
+        # Title at fixed position
         title_lines = self._wrap_text(title, self.title_font, max_text_w, draw)
-        y = SAFE_MARGIN + 100
+        y = TITLE_Y
         for line in title_lines:
-            # Shadow
             tw, th = self._measure(draw, line, self.title_font)
-            tx = (CANVAS_W - tw) // 2
+            if TITLE_X_ALIGN == "center":
+                tx = (CANVAS_W - tw) // 2
+            else:
+                tx = TITLE_X
+            # Shadow
             draw.text((tx + SHADOW_OFFSET[0], y + SHADOW_OFFSET[1]), line, font=self.title_font, fill=TITLE_SHADOW)
             draw.text((tx, y), line, font=self.title_font, fill=TITLE_COLOR)
-            y += int(th * LINE_SPACING)
+            y += int(th * TITLE_LINE_SPACING)
 
         # Bullets center area
         bullet_text = bullets.replace("\r", "").strip()
@@ -120,21 +141,14 @@ class Renderer:
             for cont in wrapped[1:]:
                 bullet_lines.append(f"  {cont}")
 
-        # Compute total height to vertically center in remaining space
-        line_heights = [self._measure(draw, line, self.text_font)[1] for line in bullet_lines]
-        total_h = sum(int(h * BULLET_LINE_SPACING) for h in line_heights)
-        remaining_top = max(y + SAFE_MARGIN, 0)
-        # Start bullets 300px higher than the previous centered position
-        start_y = (remaining_top + (CANVAS_H - remaining_top - SAFE_MARGIN - total_h) // 2) - 300
-
-        y2 = max(start_y, y + SAFE_MARGIN)
+        # Bullets at fixed position
+        y2 = BULLET_Y
         for line in bullet_lines:
             lw, lh = self._measure(draw, line, self.text_font)
-            # Left align bullets to the safe margin
-            x = SAFE_MARGIN
+            x = BULLET_X
             # Shadow
-            draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=TEXT_SHADOW)
-            draw.text((x, y2), line, font=self.text_font, fill=TEXT_COLOR)
+            draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=BULLET_SHADOW)
+            draw.text((x, y2), line, font=self.text_font, fill=BULLET_COLOR)
             y2 += int(lh * BULLET_LINE_SPACING)
 
         return img
