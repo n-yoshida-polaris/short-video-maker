@@ -8,6 +8,21 @@ from pprint import pprint
 from typing import Optional, List
 
 
+def _project_root() -> str:
+    # svmu directory -> project root
+    return os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+
+
+def _first_mp4_in(dir_path: str) -> Optional[str]:
+    if not os.path.isdir(dir_path):
+        return None
+    for base, _, files in os.walk(dir_path):
+        for fn in sorted(files):
+            if fn.lower().endswith(".mp4"):
+                return os.path.join(base, fn)
+    return None
+
+
 class ComposeError(Exception):
     pass
 
@@ -105,3 +120,81 @@ def compose_with_overlay(
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
         raise ComposeError(f"ffmpeg failed with code {e.returncode}") from e
+
+
+def append_ending_if_exists(
+        main_video_path: str,
+        ffmpeg_path: Optional[str] = None,
+        video_codec: str = "libx264",
+        crf: int = 20,
+        preset: str = "medium",
+) -> bool:
+    """
+    If APP_ROOT/ending contains an .mp4, append it to the end of main_video_path.
+    Returns True if appended, False if no ending was found or on safe no-op.
+    On ffmpeg failure, leaves the original file intact and returns False.
+    """
+    try:
+        if not os.path.isfile(main_video_path):
+            return False
+
+        app_root = _project_root()
+        ending_dir = os.path.join(app_root, "ending")
+        ending_mp4 = _first_mp4_in(ending_dir)
+        if not ending_mp4:
+            # No ending clip -> nothing to do
+            return False
+
+        tmp_out = main_video_path + ".tmp_concat.mp4"
+        if os.path.exists(tmp_out):
+            try:
+                os.remove(tmp_out)
+            except Exception:
+                pass
+
+        exe = ffmpeg_path or "ffmpeg"
+        # Concat with re-encode to avoid codec mismatch problems
+        filter_graph = (
+            "[0:v][0:a?][1:v][1:a?]concat=n=2:v=1:a=1[v][a]"
+        )
+        cmd = [
+            exe,
+            "-y",
+            "-i", main_video_path,
+            "-i", ending_mp4,
+            "-filter_complex", filter_graph,
+            "-map", "[v]",
+            "-map", "[a]",
+            "-c:v", video_codec,
+            "-preset", preset,
+            "-crf", str(crf),
+            "-pix_fmt", "yuv420p",
+            "-shortest",
+            tmp_out,
+        ]
+
+        try:
+            resolved = shutil.which(exe) if exe == "ffmpeg" else exe
+            print(resolved)
+            pprint(cmd)
+            subprocess.run(cmd, check=True)
+        except subprocess.CalledProcessError:
+            # Keep original video if concat fails
+            return False
+
+        # Replace original with concatenated output
+        try:
+            os.replace(tmp_out, main_video_path)
+        except Exception:
+            # Cleanup temp if replace failed
+            try:
+                os.remove(tmp_out)
+            except Exception:
+                pass
+            return False
+
+        print(f"[OK] Ending appended: {ending_mp4}")
+        return True
+    except Exception as _:
+        # Be conservative: do not break the flow
+        return False
