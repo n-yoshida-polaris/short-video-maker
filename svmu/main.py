@@ -27,7 +27,7 @@ def process_row(
     print(f"\n[INFO] Processing id={idea.id} title={idea.title!r}")
 
     # 1) Render overlay image
-    renderer = Renderer(font_path=cfg.font_path)
+    renderer = Renderer(font_path=cfg.font_path, title_color=cfg.title_color, bullet_color=cfg.bullet_color)
     overlay_img = renderer.render(idea.title, idea.bullets)
 
     overlays_dir = os.path.join(out_dir, "overlays")

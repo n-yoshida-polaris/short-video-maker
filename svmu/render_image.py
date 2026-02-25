@@ -39,10 +39,13 @@ MAX_TEXT_W = 900
 
 
 class Renderer:
-    def __init__(self, font_path: Optional[str] = None):
+    def __init__(self, font_path: Optional[str] = None, title_color: Optional[Tuple[int, int, int, int]] = None, bullet_color: Optional[Tuple[int, int, int, int]] = None):
         # Try to load a Mincho/serif font; fall back to default
         self.title_font = self._load_font(font_path, TITLE_FONT_SIZE)
         self.text_font = self._load_font(font_path, BULLET_FONT_SIZE)
+        # Colors
+        self.title_color = title_color or TITLE_COLOR
+        self.bullet_color = bullet_color or BULLET_COLOR
 
     @staticmethod
     def _load_font(font_path: Optional[str], size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -121,7 +124,7 @@ class Renderer:
                 tx = TITLE_X
             # Shadow
             draw.text((tx + SHADOW_OFFSET[0], y + SHADOW_OFFSET[1]), line, font=self.title_font, fill=TITLE_SHADOW)
-            draw.text((tx, y), line, font=self.title_font, fill=TITLE_COLOR)
+            draw.text((tx, y), line, font=self.title_font, fill=self.title_color)
             y += int(th * TITLE_LINE_SPACING)
 
         # Bullets center area
@@ -161,7 +164,7 @@ class Renderer:
                 lh = getattr(self.text_font, "size", 12)
             # Shadow
             draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=BULLET_SHADOW)
-            draw.text((x, y2), line, font=self.text_font, fill=BULLET_COLOR)
+            draw.text((x, y2), line, font=self.text_font, fill=self.bullet_color)
             y2 += int(lh * BULLET_LINE_SPACING)
 
         return img
