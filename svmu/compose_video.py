@@ -158,7 +158,7 @@ def append_ending_if_exists(
         exe = ffmpeg_path or "ffmpeg"
         # Concat with re-encode to avoid codec mismatch problems
         filter_graph = (
-            "[0:v][0:a?][1:v][1:a?]concat=n=2:v=1:a=1[v][a]"
+            "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[v][a]"
         )
         cmd = [
             exe,
