@@ -4,7 +4,7 @@ import argparse
 import os
 from datetime import datetime
 
-from svmu.compose_video import compose_with_overlay, ComposeError
+from svmu.compose_video import compose_with_overlay, ComposeError, append_ending_if_exists
 from svmu.config import load_config
 from svmu.excel_io import ExcelStore
 from svmu.google_sheets_io import GoogleSheetStore
@@ -27,7 +27,14 @@ def process_row(
     print(f"\n[INFO] Processing id={idea.id} title={idea.title!r}")
 
     # 1) Render overlay image
-    renderer = Renderer(font_path=cfg.font_path)
+    renderer = Renderer(
+        font_path=cfg.font_path,
+        title_color=cfg.title_color,
+        bullet_color=cfg.bullet_color,
+        title_shadow=cfg.title_shadow,
+        bullet_shadow=cfg.bullet_shadow,
+        shadow_offset=cfg.shadow_offset,
+    )
     overlay_img = renderer.render(idea.title, idea.bullets)
 
     overlays_dir = os.path.join(out_dir, "overlays")
@@ -62,6 +69,23 @@ def process_row(
         return False, None
 
     print(f"[OK] Video composed: {video_out}")
+
+    # 2.5) Append ending clip if available under APP_ROOT/ending
+    try:
+        appended = append_ending_if_exists(
+            main_video_path=video_out,
+            ffmpeg_path=cfg.ffmpeg_path,
+            video_codec="libx264",
+            crf=20,
+            preset="medium",
+            ending_dir=cfg.ending_video,
+        )
+        if appended:
+            print("[OK] Ending clip appended to the video.")
+        else:
+            print("[INFO] No ending clip found or append skipped.")
+    except Exception as e:
+        print(f"[WARN] Failed to append ending clip: {e}")
 
     # 3) Upload step removed: skip uploads and return compose success only
     print("[INFO] Upload step is disabled; only rendering and composition are performed.")
