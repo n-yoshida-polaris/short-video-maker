@@ -67,7 +67,7 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
 - Python 3.10+
 - ffmpeg が PATH で利用可能であること
 - フォント：日本語の明朝/セリフ系フォント（例：Noto Serif CJK JP）をご用意ください。`.env` の `FONT_PATH` で指定できます。
-- フォント色は `.env` または YAML で指定できます（`TITLE_COLOR`, `BULLET_COLOR`）。未指定の場合は白（#FFFFFF）になります。
+- フォント色・影は `.env` または YAML で指定できます（`TITLE_COLOR`, `BULLET_COLOR`, `TITLE_SHADOW`, `BULLET_SHADOW`, `SHADOW_OFFSET`）。色は #RRGGBB または #RRGGBBAA（アルファ付き）形式。未指定の文字色は白（#FFFFFF）、影はタイトル #000000B4・本文 #000000A0、オフセットは 2,2 になります。
 
 ## クイックスタート
 
@@ -150,6 +150,9 @@ BACKGROUND_VIDEO: ./assets/backgrounds/bg1.mp4
 OUTPUT_DIR: ./outputs/finance
 TITLE_COLOR: "#000000"  # タイトルの文字色（例）
 BULLET_COLOR: "#FFAA00"  # 本文の文字色（例）
+TITLE_SHADOW: "#000000B4"  # タイトル影の色（例: 黒70%）
+BULLET_SHADOW: "#000000A0"  # 本文影の色（例: 黒62.7%）
+SHADOW_OFFSET: "2,2"        # 影のずらし量（x,y）
 DEFAULT_STATUS_READY: Ready
 DEFAULT_STATUS_DONE: Done
 ```

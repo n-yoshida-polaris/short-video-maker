@@ -19,6 +19,11 @@ FONT_PATH: ./assets/fonts/NotoSerifCJKjp-Regular.otf
 # If not set, defaults to white (#FFFFFF).
 TITLE_COLOR: "#FFFFFF"
 BULLET_COLOR: "#FFFFFF"
+# Shadow colors (hex). Defaults: TITLE_SHADOW=#000000B4 (black 70%), BULLET_SHADOW=#000000A0 (black 62.7%)
+TITLE_SHADOW: "#000000B4"
+BULLET_SHADOW: "#000000A0"
+# Shadow offset in pixels. Formats: "x,y", "x y", or single number for both.
+SHADOW_OFFSET: "2,2"
 
 # Optional: absolute path to ffmpeg executable. If unset, system PATH will be used.
 FFMPEG_PATH:

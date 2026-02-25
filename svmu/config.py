@@ -19,6 +19,10 @@ class AppConfig:
     # Font colors (RGBA)
     title_color: Tuple[int, int, int, int]
     bullet_color: Tuple[int, int, int, int]
+    # Shadow colors and offset
+    title_shadow: Tuple[int, int, int, int]
+    bullet_shadow: Tuple[int, int, int, int]
+    shadow_offset: Tuple[int, int]
     # Google Sheets
     use_google_sheets: bool
     gsheet_spreadsheet_id: Optional[str]
@@ -59,6 +63,30 @@ def _parse_hex_color(value: Optional[str], default: Tuple[int, int, int, int]) -
     return default
 
 
+def _parse_offset(value: Optional[str], default: Tuple[int, int]) -> Tuple[int, int]:
+    if value is None:
+        return default
+    if isinstance(value, tuple) and len(value) == 2:
+        return int(value[0]), int(value[1])
+    if isinstance(value, (list, set)):
+        try:
+            v = list(value)
+            return int(v[0]), int(v[1])
+        except Exception:
+            return default
+    s = str(value).strip().replace(" ", ",")
+    parts = [p for p in s.split(",") if p != ""]
+    try:
+        if len(parts) == 1:
+            n = int(parts[0])
+            return (n, n)
+        if len(parts) >= 2:
+            return (int(parts[0]), int(parts[1]))
+    except Exception:
+        return default
+    return default
+
+
 def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
     # .env overrides
     load_dotenv(override=True)
@@ -77,6 +105,14 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
     title_color = _parse_hex_color(get("TITLE_COLOR", None), default_white)
     bullet_color = _parse_hex_color(get("BULLET_COLOR", None), default_white)
 
+    # Shadows: defaults match render_image module constants
+    default_title_shadow = (0, 0, 0, 180)
+    default_bullet_shadow = (0, 0, 0, 160)
+    default_shadow_offset = (2, 2)
+    title_shadow = _parse_hex_color(get("TITLE_SHADOW", None), default_title_shadow)
+    bullet_shadow = _parse_hex_color(get("BULLET_SHADOW", None), default_bullet_shadow)
+    shadow_offset = _parse_offset(get("SHADOW_OFFSET", None), default_shadow_offset)
+
     # 設定を返す
     return AppConfig(
         excel_path=get("EXCEL_PATH", "./assets/ideas.xlsx"),
@@ -87,6 +123,9 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
         ffmpeg_path=get("FFMPEG_PATH", "./assets/ffmpeg.exe"),
         title_color=title_color,
         bullet_color=bullet_color,
+        title_shadow=title_shadow,
+        bullet_shadow=bullet_shadow,
+        shadow_offset=shadow_offset,
         use_google_sheets=str_to_bool(str(get("USE_GOOGLE_SHEETS", "false"))),
         gsheet_spreadsheet_id=get("GSHEET_SPREADSHEET_ID", None),
         gsheet_service_account_json=get("GSHEET_SERVICE_ACCOUNT_JSON", None),

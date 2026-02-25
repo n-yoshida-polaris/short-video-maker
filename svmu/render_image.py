@@ -39,13 +39,22 @@ MAX_TEXT_W = 900
 
 
 class Renderer:
-    def __init__(self, font_path: Optional[str] = None, title_color: Optional[Tuple[int, int, int, int]] = None, bullet_color: Optional[Tuple[int, int, int, int]] = None):
+    def __init__(self, font_path: Optional[str] = None,
+                 title_color: Optional[Tuple[int, int, int, int]] = None,
+                 bullet_color: Optional[Tuple[int, int, int, int]] = None,
+                 title_shadow: Optional[Tuple[int, int, int, int]] = None,
+                 bullet_shadow: Optional[Tuple[int, int, int, int]] = None,
+                 shadow_offset: Optional[Tuple[int, int]] = None):
         # Try to load a Mincho/serif font; fall back to default
         self.title_font = self._load_font(font_path, TITLE_FONT_SIZE)
         self.text_font = self._load_font(font_path, BULLET_FONT_SIZE)
         # Colors
         self.title_color = title_color or TITLE_COLOR
         self.bullet_color = bullet_color or BULLET_COLOR
+        # Shadows
+        self.title_shadow = title_shadow or TITLE_SHADOW
+        self.bullet_shadow = bullet_shadow or BULLET_SHADOW
+        self.shadow_offset = shadow_offset or SHADOW_OFFSET
 
     @staticmethod
     def _load_font(font_path: Optional[str], size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -123,7 +132,7 @@ class Renderer:
             else:
                 tx = TITLE_X
             # Shadow
-            draw.text((tx + SHADOW_OFFSET[0], y + SHADOW_OFFSET[1]), line, font=self.title_font, fill=TITLE_SHADOW)
+            draw.text((tx + self.shadow_offset[0], y + self.shadow_offset[1]), line, font=self.title_font, fill=self.title_shadow)
             draw.text((tx, y), line, font=self.title_font, fill=self.title_color)
             y += int(th * TITLE_LINE_SPACING)
 
@@ -163,7 +172,7 @@ class Renderer:
             if lh == 0:
                 lh = getattr(self.text_font, "size", 12)
             # Shadow
-            draw.text((x + SHADOW_OFFSET[0], y2 + SHADOW_OFFSET[1]), line, font=self.text_font, fill=BULLET_SHADOW)
+            draw.text((x + self.shadow_offset[0], y2 + self.shadow_offset[1]), line, font=self.text_font, fill=self.bullet_shadow)
             draw.text((x, y2), line, font=self.text_font, fill=self.bullet_color)
             y2 += int(lh * BULLET_LINE_SPACING)
 
