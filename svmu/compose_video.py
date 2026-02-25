@@ -128,9 +128,12 @@ def append_ending_if_exists(
         video_codec: str = "libx264",
         crf: int = 20,
         preset: str = "medium",
+        ending_dir: Optional[str] = None,
 ) -> bool:
     """
-    If APP_ROOT/ending contains an .mp4, append it to the end of main_video_path.
+    Append an ending clip if available.
+    - If ending_dir is provided, search that directory (recursive) for the first .mp4.
+    - Otherwise, fallback to APP_ROOT/ending.
     Returns True if appended, False if no ending was found or on safe no-op.
     On ffmpeg failure, leaves the original file intact and returns False.
     """
@@ -138,9 +141,9 @@ def append_ending_if_exists(
         if not os.path.isfile(main_video_path):
             return False
 
-        app_root = _project_root()
-        ending_dir = os.path.join(app_root, "ending")
-        ending_mp4 = _first_mp4_in(ending_dir)
+        # Resolve ending directory (YAML-configurable) or default to project ./ending
+        search_dir = ending_dir if ending_dir else os.path.join(_project_root(), "ending")
+        ending_mp4 = _first_mp4_in(search_dir)
         if not ending_mp4:
             # No ending clip -> nothing to do
             return False

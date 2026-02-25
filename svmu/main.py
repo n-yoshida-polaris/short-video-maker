@@ -78,6 +78,7 @@ def process_row(
             video_codec="libx264",
             crf=20,
             preset="medium",
+            ending_dir=cfg.ending_video,
         )
         if appended:
             print("[OK] Ending clip appended to the video.")

@@ -59,7 +59,7 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
 - データソースを選択可能: Excel（.xlsx）または Google スプレッドシート
 - Pillowでタイトル＋箇条書きの縦型画像（1080x1920）をレンダリング
 - ffmpegで背景動画（H.264）にテキスト画像を合成し、背景の音声は維持
-- APP_ROOT/ending 配下に .mp4 があれば、生成動画の末尾に自動で連結（再エンコードでコーデック不整合を回避）
+- APP_ROOT/ending（または YAML/環境変数で指定した ENDING_VIDEO）配下に .mp4 があれば、生成動画の末尾に自動で連結（再エンコードでコーデック不整合を回避）
 - 出力フォルダ・安全なファイル名で保存
 - `.env` と YAML による環境変数・設定管理
 
@@ -119,10 +119,12 @@ Excel/Googleスプレッドシートの各行から短尺の縦動画（1080x192
 
 ## エンディング動画の自動付与
 
-- プロジェクト直下の `ending/` ディレクトリに `.mp4` ファイルが存在する場合、生成した動画の末尾に自動で連結されます。
+- 既定ではプロジェクト直下の `ending/` ディレクトリに `.mp4` があれば、生成動画の末尾に自動で連結されます。
+- `ENDING_VIDEO`（YAML もしくは `.env`）を設定すると、探索ディレクトリを上書きできます。
+  - 例: `ENDING_DVIDEO: ./branding/outros`（YAML） もしくは `ENDING_VIDEO=./branding/outros`（.env）
 - 複数の `.mp4` がある場合は、（再帰的に探索した上で）ファイル名の昇順で最初に見つかった 1 つを使用します。
 - 連結は ffmpeg の concat フィルタで再エンコード（H.264, yuv420p, CRF=20, preset=medium）して行い、コーデック不整合による失敗を避けます。
-- 無効化したい場合は `ending/` から `.mp4` を取り除いてください（機能は自動検出のため、設定変更は不要です）。
+- 無効化したい場合は、指定ディレクトリ（既定は `ending/`）から `.mp4` を取り除いてください。
 - ffmpeg パスは `.env` の `FFMPEG_PATH` で指定できます（未指定時はシステムの `ffmpeg` を使用）。本リポジトリには Windows 用に `assets/ffmpeg.exe` も同梱されています。
 
 例: ディレクトリ構成
@@ -168,6 +170,7 @@ GSHEET_SPREADSHEET_ID: "YOUR_SHEET_ID"
 SHEET_NAME: シート1
 BACKGROUND_VIDEO: ./assets/backgrounds/bg1.mp4
 OUTPUT_DIR: ./outputs/finance
+ENDING_VIDEO: ./ending  # エンディング用のディレクトリ（省略時は ./ending）
 TITLE_COLOR: "#000000"  # タイトルの文字色（例）
 BULLET_COLOR: "#FFAA00"  # 本文の文字色（例）
 TITLE_SHADOW: "#000000B4"  # タイトル影の色（例: 黒70%）

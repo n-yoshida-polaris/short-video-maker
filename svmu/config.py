@@ -16,6 +16,7 @@ class AppConfig:
     output_dir: str
     font_path: Optional[str]
     ffmpeg_path: Optional[str]
+    ending_video: Optional[str]
     # Font colors (RGBA)
     title_color: Tuple[int, int, int, int]
     bullet_color: Tuple[int, int, int, int]
@@ -121,6 +122,7 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
         output_dir=get("OUTPUT_DIR", "./outputs"),
         font_path=get("FONT_PATH", "./assets/yu-mincho-demibold.ttf"),
         ffmpeg_path=get("FFMPEG_PATH", "./assets/ffmpeg.exe"),
+        ending_video=get("ENDING_DVIDEO", "./ending"),
         title_color=title_color,
         bullet_color=bullet_color,
         title_shadow=title_shadow,
