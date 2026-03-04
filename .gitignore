@@ -1,0 +1,35 @@
+# IDE
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+/outputs/overlays/*
+/outputs/videos/*
+/credentials/*
+/channels/*.yaml
+config*.yaml
+
+# assets
+/assets/ffmpeg.exe
+/assets/fonts/*.ttf
+/assets/fonts/*.otf
+
+# Claude Code local settings
+.claude/*.local.json
+
+# Claude Code cache / runtime files
+.claude/cache/
+.claude/tmp/
+.claude/logs/

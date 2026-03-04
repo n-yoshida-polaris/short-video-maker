@@ -1,0 +1,51 @@
+# チャンネル別版設定管理ファイル（スプレッドシート版）
+# これはチャンネルごとの設定サンプルです。
+# このファイルを finance.yaml / english.yaml などの名前でコピーし、値を編集してください。
+# .env と同じキーをすべて上書きできます。
+# 未記載のキーは .env またはコードのデフォルト値が使われます。
+
+# --- データソース ---
+
+# 動画台本の設定(true：スプレッドシート , false：Excel)
+USE_GOOGLE_SHEETS: true
+
+# Excel設定（USE_GOOGLE_SHEETS=false の場合に使用）
+EXCEL_PATH:
+SHEET_NAME:
+
+# スプレッドシート設定（USE_GOOGLE_SHEETS=true の場合に使用）
+GSHEET_SPREADSHEET_ID: YOUR_SPREADSHEET_ID
+GSHEET_SERVICE_ACCOUNT_JSON: ./credentials/service_account.json
+
+# --- 動画素材 ---
+# BACKGROUND_VIDEO は単一の mp4 ファイル、または複数の mp4 を含むディレクトリを指定できます。
+# ディレクトリを指定した場合、作成ごとに mp4 が1本ランダムに選ばれます。
+BACKGROUND_VIDEO: ./assets/backgrounds/bg_video_1.mp4
+
+# オプション: 終了ディレクトリ。設定されている場合、このディレクトリ内で最初に見つかった .mp4 ファイルが、生成されたビデオの末尾に追加されます。
+ENDING_VIDEO: ./ending
+
+# --- 出力 ---
+# チャンネルごとに OUTPUT_DIR を変えておくと出力が混在しません。
+OUTPUT_DIR: ./outputs/spreadsheets
+
+# --- フォント ---
+FONT_PATH: ./assets/fonts/NotoSerifCJKjp-Regular.otf
+
+# フォントカラー（16進数）。例: #FFFFFF、#000000、#FFAA00、#112233CC（アルファ値付き）
+TITLE_COLOR: "#FFFFFF"
+BULLET_COLOR: "#FFFFFF"
+
+# 影の色（16進数）。デフォルト：TITLE_SHADOW=#000000B4（黒 70%）、BULLET_SHADOW=#000000A0（黒 62.7%）
+TITLE_SHADOW: "#000000B4"
+BULLET_SHADOW: "#000000A0"
+
+# ピクセル単位の影のオフセット。形式: "x,y"、"x y"、または両方を表す単一の数値。
+SHADOW_OFFSET: 2,2
+
+# --- ffmpeg ---
+# FFMPEG_PATH: ./assets/ffmpeg.exe   # 省略時はシステムPATHを使用
+
+# --- ステータス文字列 ---
+DEFAULT_STATUS_READY: Ready
+DEFAULT_STATUS_DONE: Done
