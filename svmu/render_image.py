@@ -143,7 +143,8 @@ class Renderer:
             bullet_items = [s.strip() for s in bullet_text.split("・") if s.strip()]
         else:
             # Preserve in-between empty lines, but drop trailing empty lines
-            tmp_items = [s.strip() for s in bullet_text.split("\n")]
+            # tmp_items = [s.strip() for s in bullet_text.split("\n")]
+            tmp_items = [s for s in bullet_text.split("\n")]
             # Remove empty lines at the end only
             while tmp_items and tmp_items[-1] == "":
                 tmp_items.pop()
