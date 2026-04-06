@@ -124,7 +124,7 @@ def run(
     try:
         rows = store.read_ready(status_ready=cfg.status_ready)
     except Exception:
-        print("[WARN] Couldn't read rows from sheets.")
+        print(f"[WARN] Couldn't read rows from sheets. :{sheet_name}")
 
 
     if not rows:
