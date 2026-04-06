@@ -120,7 +120,12 @@ def run(
         store = ExcelStore(excel_path=excel_path, sheet_name=sheet_name)
         print(f"[INFO] Using Excel file: {excel_path} sheet={sheet_name or '(default)'}")
 
-    rows = store.read_ready(status_ready=cfg.status_ready)
+    rows = None
+    try:
+        rows = store.read_ready(status_ready=cfg.status_ready)
+    except Exception:
+        print("[WARN] Couldn't read rows from sheets.")
+
 
     if not rows:
         print("[INFO] No rows with Ready status.")
