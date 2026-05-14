@@ -123,7 +123,8 @@ def run(
     rows = None
     try:
         rows = store.read_ready(status_ready=cfg.status_ready)
-    except Exception:
+    except Exception as e:
+        print(e)
         print(f"[WARN] Couldn't read rows from sheets. :{sheet_name}")
 
 
