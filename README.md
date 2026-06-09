@@ -4,17 +4,18 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)
 
-Excel または Google スプレッドシートに入力したテキスト（タイトル・箇条書き）をもとに、縦型ショート動画（1080×1920）を自動生成するPythonツールです。
+タイトルと箇条書きテキストをもとに、縦型ショート動画（1080×1920）を自動生成するPythonツールです。
 
 **できること:**
 
-- スプレッドシートの各行を1本の動画として一括生成
+- **ダイレクトモード**: スプレッドシート不要。コマンドオプションだけで1本の動画を即生成
+- **スプレッドシートモード**: Excel または Google スプレッドシートの各行を1本の動画として一括生成
 - タイトル＋箇条書きテキストを Pillow で画像化し、背景動画（mp4）へ ffmpeg でオーバーレイ合成
 - エンディング動画を末尾に自動連結
 - 複数チャンネル分の設定（YAML）をまとめて順番に実行（マルチチャンネル運用）
-- 生成完了後、シートのステータス列を自動更新
+- スプレッドシートモードでは生成完了後にステータス列を自動更新
 
-**典型的なユースケース:** SNS・YouTube Shorts 向けの縦型スライド動画を、ネタ帳（スプレッドシート）から手間なく量産する。
+**典型的なユースケース:** SNS・YouTube Shorts 向けの縦型スライド動画をコマンド1つで生成、またはネタ帳（スプレッドシート）から手間なく量産する。
 
 ---
 
@@ -62,6 +63,9 @@ Excel または Google スプレッドシートに入力したテキスト（タ
 
 7. 実行:
    ```bash
+   # ダイレクトモード（スプレッドシート不要）
+   python -m svmu.main --title "タイトルここ" --bullet "項目1" --bullet "項目2" --bullet "項目3"
+
    # Excel 利用時
    python -m svmu.main --excel "$EXCEL_PATH" --sheet "Sheet1" --output ./outputs --limit 5
 
@@ -186,6 +190,92 @@ python -m svmu.main --excel "./assets/ideas.xlsx" --sheet "Sheet1" --output ./ou
 
 ## 設定リファレンス
 
+### コマンドオプション
+
+#### `python -m svmu.main`
+
+シングルチャンネルの動画生成コマンドです。`--title` を指定したダイレクトモードと、スプレッドシートを参照するスプレッドシートモードの2種類で動作します。
+
+**ダイレクトモード（スプレッドシート不要）**
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--title TEXT` | 動画タイトル。**指定するとダイレクトモードで起動**し、スプレッドシートを参照しない | — |
+| `--bullet TEXT` | 箇条書き1行。複数回指定可（順番通りに並ぶ） | — |
+| `--id TEXT` | 出力ファイル名のプレフィックス | 実行日時（`YYYYMMDDHHmmSS`） |
+
+```bash
+python -m svmu.main \
+  --title "今日から使えるPython Tips" \
+  --bullet "リスト内包表記で簡潔に書く" \
+  --bullet "f-stringを使う" \
+  --bullet "型ヒントでバグを減らす"
+```
+
+**スプレッドシートモード**
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--excel FILE` | Excel ファイルのパス | `EXCEL_PATH` の値 |
+| `--sheet NAME` | 読み込むシート名 | `SHEET_NAME` の値 |
+| `--limit N` | 最大処理件数 | `10` |
+| `--use-google-sheets` | Google スプレッドシートを使用する（フラグ） | `false` |
+| `--gsheet-id ID` | Google スプレッドシートの ID | `GSHEET_SPREADSHEET_ID` の値 |
+| `--gsheet-sa-json FILE` | サービスアカウント JSON ファイルのパス | `GSHEET_SERVICE_ACCOUNT_JSON` の値 |
+| `--status-ready TEXT` | 処理対象とみなすステータス値 | `Ready` |
+| `--status-done TEXT` | 処理完了後に書き込むステータス値 | `Done` |
+
+```bash
+python -m svmu.main --excel ./assets/ideas.xlsx --sheet "Sheet1" --limit 5
+```
+
+**動画・出力**
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--output DIR` | 出力ディレクトリ | `OUTPUT_DIR` の値 |
+| `--background PATH` | 背景動画のパス（`.mp4` またはディレクトリ） | `BACKGROUND_VIDEO` の値 |
+| `--ending DIR` | エンディング動画ディレクトリのパス | `ENDING_VIDEO` の値 |
+| `--ffmpeg PATH` | ffmpeg 実行ファイルのパス | システム PATH |
+
+**スタイル**
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--font FILE` | フォントファイルのパス（OTF/TTF） | `FONT_PATH` の値 |
+| `--title-color COLOR` | タイトルの文字色（`#RRGGBB` または `#RRGGBBAA`） | `#FFFFFF` |
+| `--bullet-color COLOR` | 箇条書きの文字色 | `#FFFFFF` |
+| `--title-shadow COLOR` | タイトルの影色 | `#000000B4` |
+| `--bullet-shadow COLOR` | 箇条書きの影色 | `#000000A0` |
+| `--shadow-offset X,Y` | 影のオフセット（例: `2,2`） | `2,2` |
+
+**その他**
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--config FILE` | 追加設定の YAML ファイルパス | なし |
+
+> すべてのオプションは `.env` および `--config` で指定した YAML より優先されます。
+
+---
+
+#### `python -m svmu_multi.run`
+
+`channels/` ディレクトリの YAML ファイルをもとに複数チャンネルを順番に処理します。
+
+| オプション | 説明 | デフォルト |
+|:---|:---|:---|
+| `--channels-dir DIR` | チャンネル YAML の置き場所 | `./channels` |
+| `--limit N` | チャンネルあたりの最大処理件数 | `10` |
+| `--dry-run` | チャンネル一覧を表示するだけで処理しない | — |
+
+```bash
+python -m svmu_multi.run --limit 3
+python -m svmu_multi.run --dry-run
+```
+
+---
+
 ### 環境変数一覧
 
 `.env` および `channels/*.yaml` で設定できる環境変数の一覧です（YAML は `KEY: value` 形式、`.env` は `KEY=value` 形式）。
@@ -236,10 +326,12 @@ python -m svmu.main --excel "./assets/ideas.xlsx" --sheet "Sheet1" --output ./ou
 
 設定値は以下の優先順位で上書きされます（上が高優先）:
 
-1. **CLI オプション** (`--excel`, `--sheet`, `--output`, `--limit`)
+1. **CLI オプション** (`--title`, `--bullet`, `--id`, `--excel`, `--sheet`, `--output`, `--limit`)
 2. **YAML** (`channels/*.yaml`)
 3. **`.env`** 環境変数
 4. **コードのデフォルト値**
+
+> ダイレクトモード（`--title` 指定）の場合、スプレッドシート系の設定（`--excel`, `--sheet`, `USE_GOOGLE_SHEETS` など）は参照されません。
 
 ### シート列仕様
 
