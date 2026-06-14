@@ -99,6 +99,7 @@ def run(
         title: Optional[str] = None,
         bullets: Optional[list] = None,
         idea_id: Optional[str] = None,
+        output_filename: Optional[str] = None,
         background_video: Optional[str] = None,
         font_path: Optional[str] = None,
         ffmpeg_path: Optional[str] = None,
@@ -164,7 +165,7 @@ def run(
             tags=None,
             description=None,
             status="Ready",
-            output_filename=None,
+            output_filename=output_filename,
             output_datetime=None,
         )
         success, base_name = process_row(cfg, idea, out_dir)
@@ -241,6 +242,8 @@ def main():
                         help="箇条書き1行（複数回指定可）")
     direct.add_argument("--id", dest="idea_id", default=None,
                         help="出力ファイル名のプレフィックス（省略時は実行日時）")
+    direct.add_argument("--output-filename", dest="output_filename", default=None,
+                        help="出力ファイル名（拡張子なし）。指定するとプレフィックス+タイトルより優先される")
 
     # --- Spreadsheet mode ---
     sheet = parser.add_argument_group("スプレッドシートモード")
@@ -302,6 +305,7 @@ def main():
         title=args.title,
         bullets=args.bullets,
         idea_id=args.idea_id,
+        output_filename=args.output_filename,
         background_video=args.background_video,
         font_path=args.font_path,
         ffmpeg_path=args.ffmpeg_path,
