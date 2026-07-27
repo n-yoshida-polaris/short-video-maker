@@ -254,6 +254,7 @@ python -m svmu.main --excel ./assets/ideas.xlsx --sheet "Sheet1" --limit 5
 | `--bullet-stroke-color COLOR` | 箇条書きの縁取り色 | `#000028` |
 | `--title-font-weight WGHT` | タイトルのフォントウェイト（可変フォントの`wght`軸。例: `700`=Bold） | フォント既定値 |
 | `--bullet-font-weight WGHT` | 箇条書きのフォントウェイト（可変フォントの`wght`軸。例: `500`=Medium） | フォント既定値 |
+| `--bullet-align {left,center}` | 箇条書きの横揃え | `left` |
 
 > `--stroke-width`/`--title-font-weight`/`--bullet-font-weight` はPillow・フォント側の対応が前提です。可変フォント（`wght`軸を持つTTF/OTF）以外では `--*-font-weight` は無視されます（例外を握りつぶして既定ウェイトのまま描画）。
 
@@ -328,6 +329,7 @@ python -m svmu_multi.run --dry-run
 | `BULLET_STROKE_COLOR` | 本文の縁取り色 | 任意 | `#000028FF`（濃紺） |
 | `TITLE_FONT_WEIGHT` | タイトルのフォントウェイト（可変フォントの`wght`軸の数値） | 任意 | フォント既定値（未指定） |
 | `BULLET_FONT_WEIGHT` | 本文のフォントウェイト（可変フォントの`wght`軸の数値） | 任意 | フォント既定値（未指定） |
+| `BULLET_X_ALIGN` | 本文の横揃え（`left` または `center`） | 任意 | `left` |
 
 #### ステータス文字列
 

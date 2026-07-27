@@ -41,6 +41,7 @@ def process_row(
         bullet_stroke_color=cfg.bullet_stroke_color,
         title_font_weight=cfg.title_font_weight,
         bullet_font_weight=cfg.bullet_font_weight,
+        bullet_x_align=cfg.bullet_x_align,
     )
     overlay_img = renderer.render(idea.title, idea.bullets)
 
@@ -121,6 +122,7 @@ def run(
         bullet_stroke_color: Optional[str] = None,
         title_font_weight: Optional[int] = None,
         bullet_font_weight: Optional[int] = None,
+        bullet_x_align: Optional[str] = None,
         use_google_sheets: Optional[bool] = None,
         gsheet_id: Optional[str] = None,
         gsheet_sa_json: Optional[str] = None,
@@ -163,6 +165,8 @@ def run(
         cfg.title_font_weight = title_font_weight
     if bullet_font_weight is not None:
         cfg.bullet_font_weight = bullet_font_weight
+    if bullet_x_align is not None:
+        cfg.bullet_x_align = bullet_x_align
     if use_google_sheets is not None:
         cfg.use_google_sheets = use_google_sheets
     if gsheet_id is not None:
@@ -325,6 +329,8 @@ def main():
                        help="タイトルのフォントウェイト（可変フォントのwght軸。例: 700=Bold）")
     style.add_argument("--bullet-font-weight", dest="bullet_font_weight", type=int, default=None, metavar="WGHT",
                        help="箇条書きのフォントウェイト（可変フォントのwght軸。例: 500=Medium）")
+    style.add_argument("--bullet-align", dest="bullet_x_align", default=None, choices=["left", "center"],
+                       help="箇条書きの横揃え（デフォルト: left）")
 
     # --- Config ---
     parser.add_argument("--config", dest="config_yaml", default=None,
@@ -357,6 +363,7 @@ def main():
         bullet_stroke_color=args.bullet_stroke_color,
         title_font_weight=args.title_font_weight,
         bullet_font_weight=args.bullet_font_weight,
+        bullet_x_align=args.bullet_x_align,
         use_google_sheets=args.use_google_sheets if args.use_google_sheets else None,
         gsheet_id=args.gsheet_id,
         gsheet_sa_json=args.gsheet_sa_json,

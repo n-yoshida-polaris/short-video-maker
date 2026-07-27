@@ -25,7 +25,8 @@ TITLE_SHADOW = (0, 0, 0, 180)
 BULLET_FONT_SIZE = 48
 BULLET_LINE_SPACING = 1.7
 BULLET_PREFIX = ""
-BULLET_X = 90   # 本文開始位置(左：絶対位置)
+BULLET_X_ALIGN = "left"  # "center" or "left"
+BULLET_X = 90   # 本文開始位置(左：絶対位置) Used when BULLET_X_ALIGN == "left"
 BULLET_Y = 560  # 本文開始位置(上：絶対位置)
 BULLET_COLOR = (255, 255, 255, 255)
 BULLET_SHADOW = (0, 0, 0, 160)
@@ -59,7 +60,8 @@ class Renderer:
                  title_stroke_color: Optional[Tuple[int, int, int, int]] = None,
                  bullet_stroke_color: Optional[Tuple[int, int, int, int]] = None,
                  title_font_weight: Optional[int] = None,
-                 bullet_font_weight: Optional[int] = None):
+                 bullet_font_weight: Optional[int] = None,
+                 bullet_x_align: Optional[str] = None):
         # Try to load a Mincho/serif font; fall back to default
         self.title_font = self._load_font(font_path, TITLE_FONT_SIZE,
                                            title_font_weight if title_font_weight is not None else TITLE_FONT_WEIGHT)
@@ -78,6 +80,8 @@ class Renderer:
         self.stroke_width = stroke_width if stroke_width is not None else STROKE_WIDTH
         self.title_stroke_color = title_stroke_color or TITLE_STROKE_COLOR
         self.bullet_stroke_color = bullet_stroke_color or BULLET_STROKE_COLOR
+        # Alignment
+        self.bullet_x_align = bullet_x_align or BULLET_X_ALIGN
 
     @staticmethod
     def _load_font(font_path: Optional[str], size: int,
@@ -210,7 +214,6 @@ class Renderer:
         # Bullets at fixed position
         y2 = BULLET_Y
         for line in bullet_lines:
-            x = BULLET_X
             # If the line is empty, create vertical spacing but don't draw text
             if line == "":
                 base_h = getattr(self.text_font, "size", 12)
@@ -219,6 +222,10 @@ class Renderer:
             lw, lh = self._measure(draw, line, self.text_font)
             if lh == 0:
                 lh = getattr(self.text_font, "size", 12)
+            if self.bullet_x_align == "center":
+                x = (CANVAS_W - lw) // 2
+            else:
+                x = BULLET_X
             # Shadow
             draw.text((x + self.shadow_offset[0], y2 + self.shadow_offset[1]), line, font=self.text_font, fill=self.bullet_shadow)
             draw.text((x, y2), line, font=self.text_font, fill=self.bullet_color,

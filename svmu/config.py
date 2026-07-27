@@ -33,6 +33,8 @@ class AppConfig:
     # Font weight (variable font "wght" axis)
     title_font_weight: Optional[int]
     bullet_font_weight: Optional[int]
+    # Bullet text horizontal alignment ("left" or "center")
+    bullet_x_align: str
     # Google Sheets
     use_google_sheets: bool
     gsheet_spreadsheet_id: Optional[str]
@@ -144,6 +146,9 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
     default_title_stroke_color = (0, 0, 40, 255)
     default_bullet_stroke_color = (0, 0, 40, 255)
 
+    # Bullet alignment: default matches render_image module constant
+    default_bullet_x_align = "left"
+
     # 設定を返す
     return AppConfig(
         excel_path=get("EXCEL_PATH", "./assets/ideas.xlsx"),
@@ -164,6 +169,7 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
         bullet_stroke_color=_parse_hex_color(get("BULLET_STROKE_COLOR", None), default_bullet_stroke_color),
         title_font_weight=_parse_int(get("TITLE_FONT_WEIGHT", None), None),
         bullet_font_weight=_parse_int(get("BULLET_FONT_WEIGHT", None), None),
+        bullet_x_align=get("BULLET_X_ALIGN", None) or default_bullet_x_align,
         use_google_sheets=str_to_bool(str(get("USE_GOOGLE_SHEETS", "false"))),
         gsheet_spreadsheet_id=get("GSHEET_SPREADSHEET_ID", None),
         gsheet_service_account_json=get("GSHEET_SERVICE_ACCOUNT_JSON", None),
