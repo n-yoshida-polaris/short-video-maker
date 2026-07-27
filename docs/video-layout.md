@@ -63,7 +63,7 @@
 | 項目 | デフォルト値 | 設定キー |
 |:---|:---|:---|
 | フォントサイズ | 48 px | — |
-| 行間 | 1.7 ×（行の高さ） | — |
+| 行間 | 1.7 ×（行の高さ） | `BULLET_LINE_SPACING` |
 | 開始 X | 90 px | — |
 | 開始 Y | 560 px | — |
 | 最大テキスト幅 | 900 px | — |
@@ -97,6 +97,21 @@
 
 ---
 
+## ストローク（縁取り）
+
+背景動画の明暗にかかわらず文字を判読できるよう、本体色の描画時に輪郭線（アウトライン）を重ねます。Pillow の `draw.text(..., stroke_width=, stroke_fill=)` を使用（`render_image.py` L135-136, L176-178）。
+
+| 項目 | デフォルト値 | 設定キー |
+|:---|:---|:---|
+| 幅（タイトル・本文共通） | `0` px（無効） | `STROKE_WIDTH` |
+| タイトルの縁取り色 | `#000028FF`（濃紺） | `TITLE_STROKE_COLOR` |
+| 本文の縁取り色 | `#000028FF`（濃紺） | `BULLET_STROKE_COLOR` |
+
+- `STROKE_WIDTH` を `1`〜`2` 程度に設定すると縁取りが有効になります。`0` の場合は従来どおり縁取りなしで描画されます。
+- 影（シャドウ）とは独立した機能で、両方同時に有効化できます。
+
+---
+
 ## フォント
 
 | 項目 | 値 |
@@ -106,6 +121,18 @@
 | フォールバック順 | `/usr/share/fonts/…/NotoSerifCJK` → `DejaVuSerif.ttf` → Pillow デフォルト |
 
 タイトルと本文は同一フォントファイルから異なるサイズ（92 px / 48 px）で生成されます。
+
+### フォントウェイト（可変フォント）
+
+`assets/fonts/NotoSerifJP-VariableFont_wght.ttf` のような `wght` 軸を持つ可変フォントを指定している場合、Pillow の `set_variation_by_axes()` でウェイトを変更できます（`render_image.py` `_load_font()`）。
+
+| 項目 | デフォルト値 | 設定キー |
+|:---|:---|:---|
+| タイトルのウェイト | フォント既定値（未指定） | `TITLE_FONT_WEIGHT` |
+| 本文のウェイト | フォント既定値（未指定） | `BULLET_FONT_WEIGHT` |
+
+- 数値は使用フォントの `wght` 軸の範囲に依存します（例: Noto Serif JP は `200`〜`900`）。目安: `400`=Regular、`500`=Medium、`700`=Bold。
+- 可変フォントでない場合、または軸の取得・設定に失敗した場合は例外を握りつぶし、フォント既定のウェイトのまま描画します。
 
 ---
 
@@ -181,6 +208,12 @@
 | `TITLE_SHADOW` | `--title-shadow` | `#000000B4` |
 | `BULLET_SHADOW` | `--bullet-shadow` | `#000000A0` |
 | `SHADOW_OFFSET` | `--shadow-offset` | `2,2` |
+| `BULLET_LINE_SPACING` | `--bullet-line-spacing` | `1.7` |
+| `STROKE_WIDTH` | `--stroke-width` | `0`（無効） |
+| `TITLE_STROKE_COLOR` | `--title-stroke-color` | `#000028FF` |
+| `BULLET_STROKE_COLOR` | `--bullet-stroke-color` | `#000028FF` |
+| `TITLE_FONT_WEIGHT` | `--title-font-weight` | フォント既定値（未指定） |
+| `BULLET_FONT_WEIGHT` | `--bullet-font-weight` | フォント既定値（未指定） |
 | `FONT_PATH` | `--font` | `./assets/fonts/NotoSerifCJKjp-Regular.otf` |
 
 色は `#RRGGBB` または `#RRGGBBAA`（AA = Alpha）形式で指定します。  

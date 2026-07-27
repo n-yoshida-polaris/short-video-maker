@@ -248,6 +248,14 @@ python -m svmu.main --excel ./assets/ideas.xlsx --sheet "Sheet1" --limit 5
 | `--title-shadow COLOR` | タイトルの影色 | `#000000B4` |
 | `--bullet-shadow COLOR` | 箇条書きの影色 | `#000000A0` |
 | `--shadow-offset X,Y` | 影のオフセット（例: `2,2`） | `2,2` |
+| `--bullet-line-spacing N` | 箇条書きの行間倍率 | `1.7` |
+| `--stroke-width PX` | 文字の縁取り幅(px)。`0`で無効 | `0` |
+| `--title-stroke-color COLOR` | タイトルの縁取り色 | `#000028` |
+| `--bullet-stroke-color COLOR` | 箇条書きの縁取り色 | `#000028` |
+| `--title-font-weight WGHT` | タイトルのフォントウェイト（可変フォントの`wght`軸。例: `700`=Bold） | フォント既定値 |
+| `--bullet-font-weight WGHT` | 箇条書きのフォントウェイト（可変フォントの`wght`軸。例: `500`=Medium） | フォント既定値 |
+
+> `--stroke-width`/`--title-font-weight`/`--bullet-font-weight` はPillow・フォント側の対応が前提です。可変フォント（`wght`軸を持つTTF/OTF）以外では `--*-font-weight` は無視されます（例外を握りつぶして既定ウェイトのまま描画）。
 
 **その他**
 
@@ -314,6 +322,12 @@ python -m svmu_multi.run --dry-run
 | `TITLE_SHADOW` | タイトルの影色 | 任意 | `#000000B4`（黒70%） |
 | `BULLET_SHADOW` | 本文の影色 | 任意 | `#000000A0`（黒62.7%） |
 | `SHADOW_OFFSET` | 影のオフセット（`x,y` 形式） | 任意 | `2,2` |
+| `BULLET_LINE_SPACING` | 本文（箇条書き）の行間倍率 | 任意 | `1.7` |
+| `STROKE_WIDTH` | 文字の縁取り幅(px)。`0`で無効 | 任意 | `0` |
+| `TITLE_STROKE_COLOR` | タイトルの縁取り色 | 任意 | `#000028FF`（濃紺） |
+| `BULLET_STROKE_COLOR` | 本文の縁取り色 | 任意 | `#000028FF`（濃紺） |
+| `TITLE_FONT_WEIGHT` | タイトルのフォントウェイト（可変フォントの`wght`軸の数値） | 任意 | フォント既定値（未指定） |
+| `BULLET_FONT_WEIGHT` | 本文のフォントウェイト（可変フォントの`wght`軸の数値） | 任意 | フォント既定値（未指定） |
 
 #### ステータス文字列
 
