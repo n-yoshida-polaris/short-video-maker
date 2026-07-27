@@ -24,7 +24,7 @@
 │      │                           │      │  ↓
 │      ├───────────────────────────┤      │
 │      │                           │      │  ↑
-│      │ 箇条書き（X=90 左揃え）   │      │  │
+│      │ 箇条書き（X=90 左揃え）※1 │      │  │
 │      │ 項目1                     │      │  560 px (BULLET_Y)
 │      │ 項目2                     │      │  │
 │      │   …                       │      │  ↓
@@ -32,6 +32,8 @@
 └─────────────────────────────────────────┘
        ←────── MAX 900 px ──────→
 ```
+
+※1 `BULLET_X_ALIGN`（デフォルト `left`）を `center` にすると、タイトルと同様に行ごとに水平センタリングされます。
 
 ---
 
@@ -64,7 +66,8 @@
 |:---|:---|:---|
 | フォントサイズ | 48 px | — |
 | 行間 | 1.7 ×（行の高さ） | `BULLET_LINE_SPACING` |
-| 開始 X | 90 px | — |
+| 横揃え | 左揃え | `BULLET_X_ALIGN`（`left`/`center`） |
+| 開始 X（左揃え時のみ） | 90 px | — |
 | 開始 Y | 560 px | — |
 | 最大テキスト幅 | 900 px | — |
 | 文字色 | `#FFFFFF`（白・不透明） | `BULLET_COLOR` |
@@ -214,6 +217,7 @@
 | `BULLET_STROKE_COLOR` | `--bullet-stroke-color` | `#000028FF` |
 | `TITLE_FONT_WEIGHT` | `--title-font-weight` | フォント既定値（未指定） |
 | `BULLET_FONT_WEIGHT` | `--bullet-font-weight` | フォント既定値（未指定） |
+| `BULLET_X_ALIGN` | `--bullet-align` | `left` |
 | `FONT_PATH` | `--font` | `./assets/fonts/NotoSerifCJKjp-Regular.otf` |
 
 色は `#RRGGBB` または `#RRGGBBAA`（AA = Alpha）形式で指定します。  
