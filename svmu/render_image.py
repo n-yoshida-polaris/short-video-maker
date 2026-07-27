@@ -34,6 +34,15 @@ BULLET_SHADOW = (0, 0, 0, 160)
 # 影設定
 SHADOW_OFFSET = (2, 2)
 
+# ストローク（縁取り）。STROKE_WIDTH=0 で無効
+STROKE_WIDTH = 0
+TITLE_STROKE_COLOR = (0, 0, 40, 255)
+BULLET_STROKE_COLOR = (0, 0, 40, 255)
+
+# フォントウェイト（可変フォントの wght 軸）。None = フォント既定値のまま
+TITLE_FONT_WEIGHT = None
+BULLET_FONT_WEIGHT = None
+
 # タイトルと本文の最大幅
 MAX_TEXT_W = 900
 
@@ -44,10 +53,18 @@ class Renderer:
                  bullet_color: Optional[Tuple[int, int, int, int]] = None,
                  title_shadow: Optional[Tuple[int, int, int, int]] = None,
                  bullet_shadow: Optional[Tuple[int, int, int, int]] = None,
-                 shadow_offset: Optional[Tuple[int, int]] = None):
+                 shadow_offset: Optional[Tuple[int, int]] = None,
+                 bullet_line_spacing: Optional[float] = None,
+                 stroke_width: Optional[int] = None,
+                 title_stroke_color: Optional[Tuple[int, int, int, int]] = None,
+                 bullet_stroke_color: Optional[Tuple[int, int, int, int]] = None,
+                 title_font_weight: Optional[int] = None,
+                 bullet_font_weight: Optional[int] = None):
         # Try to load a Mincho/serif font; fall back to default
-        self.title_font = self._load_font(font_path, TITLE_FONT_SIZE)
-        self.text_font = self._load_font(font_path, BULLET_FONT_SIZE)
+        self.title_font = self._load_font(font_path, TITLE_FONT_SIZE,
+                                           title_font_weight if title_font_weight is not None else TITLE_FONT_WEIGHT)
+        self.text_font = self._load_font(font_path, BULLET_FONT_SIZE,
+                                          bullet_font_weight if bullet_font_weight is not None else BULLET_FONT_WEIGHT)
         # Colors
         self.title_color = title_color or TITLE_COLOR
         self.bullet_color = bullet_color or BULLET_COLOR
@@ -55,28 +72,57 @@ class Renderer:
         self.title_shadow = title_shadow or TITLE_SHADOW
         self.bullet_shadow = bullet_shadow or BULLET_SHADOW
         self.shadow_offset = shadow_offset or SHADOW_OFFSET
+        # Line spacing
+        self.bullet_line_spacing = bullet_line_spacing if bullet_line_spacing is not None else BULLET_LINE_SPACING
+        # Stroke (outline)
+        self.stroke_width = stroke_width if stroke_width is not None else STROKE_WIDTH
+        self.title_stroke_color = title_stroke_color or TITLE_STROKE_COLOR
+        self.bullet_stroke_color = bullet_stroke_color or BULLET_STROKE_COLOR
 
     @staticmethod
-    def _load_font(font_path: Optional[str], size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+    def _load_font(font_path: Optional[str], size: int,
+                    weight: Optional[int] = None) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
+        font = None
         try:
             if font_path and os.path.isfile(font_path):
-                return ImageFont.truetype(font_path, size=size)
+                font = ImageFont.truetype(font_path, size=size)
         except Exception:
-            pass
-        # Try commonly available fonts on Linux
-        for candidate in [
-            "/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc",
-            "/usr/share/fonts/opentype/noto/NotoSerifCJKjp-Regular.otf",
-            "/usr/share/fonts/truetype/noto/NotoSerifCJK-Regular.ttc",
-            "/usr/share/fonts/truetype/noto/NotoSerifJP-Regular.otf",
-            "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-        ]:
+            font = None
+        if font is None:
+            # Try commonly available fonts on Linux
+            for candidate in [
+                "/usr/share/fonts/opentype/noto/NotoSerifCJK-Regular.ttc",
+                "/usr/share/fonts/opentype/noto/NotoSerifCJKjp-Regular.otf",
+                "/usr/share/fonts/truetype/noto/NotoSerifCJK-Regular.ttc",
+                "/usr/share/fonts/truetype/noto/NotoSerifJP-Regular.otf",
+                "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+            ]:
+                try:
+                    if os.path.isfile(candidate):
+                        font = ImageFont.truetype(candidate, size=size)
+                        break
+                except Exception:
+                    continue
+        if font is None:
+            font = ImageFont.load_default()
+
+        if weight is not None:
             try:
-                if os.path.isfile(candidate):
-                    return ImageFont.truetype(candidate, size=size)
+                axes = font.get_variation_axes()
+                if len(axes) == 1:
+                    font.set_variation_by_axes([weight])
+                else:
+                    values = [ax.get("default") or 400 for ax in axes]
+                    for i, ax in enumerate(axes):
+                        name = ax.get("name") or b""
+                        if b"weight" in name.lower():
+                            values[i] = weight
+                    font.set_variation_by_axes(values)
             except Exception:
-                continue
-        return ImageFont.load_default()
+                # Not a variable font, or variation axes unsupported; keep as-is
+                pass
+
+        return font
 
     @staticmethod
     def _measure(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont) -> Tuple[int, int]:
@@ -133,7 +179,8 @@ class Renderer:
                 tx = TITLE_X
             # Shadow
             draw.text((tx + self.shadow_offset[0], y + self.shadow_offset[1]), line, font=self.title_font, fill=self.title_shadow)
-            draw.text((tx, y), line, font=self.title_font, fill=self.title_color)
+            draw.text((tx, y), line, font=self.title_font, fill=self.title_color,
+                      stroke_width=self.stroke_width, stroke_fill=self.title_stroke_color)
             y += int(th * TITLE_LINE_SPACING)
 
         # Bullets center area
@@ -167,15 +214,16 @@ class Renderer:
             # If the line is empty, create vertical spacing but don't draw text
             if line == "":
                 base_h = getattr(self.text_font, "size", 12)
-                y2 += int(base_h * BULLET_LINE_SPACING)
+                y2 += int(base_h * self.bullet_line_spacing)
                 continue
             lw, lh = self._measure(draw, line, self.text_font)
             if lh == 0:
                 lh = getattr(self.text_font, "size", 12)
             # Shadow
             draw.text((x + self.shadow_offset[0], y2 + self.shadow_offset[1]), line, font=self.text_font, fill=self.bullet_shadow)
-            draw.text((x, y2), line, font=self.text_font, fill=self.bullet_color)
-            y2 += int(lh * BULLET_LINE_SPACING)
+            draw.text((x, y2), line, font=self.text_font, fill=self.bullet_color,
+                      stroke_width=self.stroke_width, stroke_fill=self.bullet_stroke_color)
+            y2 += int(lh * self.bullet_line_spacing)
 
         return img
 

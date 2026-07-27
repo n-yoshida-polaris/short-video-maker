@@ -35,6 +35,12 @@ def process_row(
         title_shadow=cfg.title_shadow,
         bullet_shadow=cfg.bullet_shadow,
         shadow_offset=cfg.shadow_offset,
+        bullet_line_spacing=cfg.bullet_line_spacing,
+        stroke_width=cfg.stroke_width,
+        title_stroke_color=cfg.title_stroke_color,
+        bullet_stroke_color=cfg.bullet_stroke_color,
+        title_font_weight=cfg.title_font_weight,
+        bullet_font_weight=cfg.bullet_font_weight,
     )
     overlay_img = renderer.render(idea.title, idea.bullets)
 
@@ -109,6 +115,12 @@ def run(
         title_shadow: Optional[str] = None,
         bullet_shadow: Optional[str] = None,
         shadow_offset: Optional[str] = None,
+        bullet_line_spacing: Optional[float] = None,
+        stroke_width: Optional[int] = None,
+        title_stroke_color: Optional[str] = None,
+        bullet_stroke_color: Optional[str] = None,
+        title_font_weight: Optional[int] = None,
+        bullet_font_weight: Optional[int] = None,
         use_google_sheets: Optional[bool] = None,
         gsheet_id: Optional[str] = None,
         gsheet_sa_json: Optional[str] = None,
@@ -139,6 +151,18 @@ def run(
         cfg.bullet_shadow = _parse_hex_color(bullet_shadow, cfg.bullet_shadow)
     if shadow_offset is not None:
         cfg.shadow_offset = _parse_offset(shadow_offset, cfg.shadow_offset)
+    if bullet_line_spacing is not None:
+        cfg.bullet_line_spacing = bullet_line_spacing
+    if stroke_width is not None:
+        cfg.stroke_width = stroke_width
+    if title_stroke_color is not None:
+        cfg.title_stroke_color = _parse_hex_color(title_stroke_color, cfg.title_stroke_color)
+    if bullet_stroke_color is not None:
+        cfg.bullet_stroke_color = _parse_hex_color(bullet_stroke_color, cfg.bullet_stroke_color)
+    if title_font_weight is not None:
+        cfg.title_font_weight = title_font_weight
+    if bullet_font_weight is not None:
+        cfg.bullet_font_weight = bullet_font_weight
     if use_google_sheets is not None:
         cfg.use_google_sheets = use_google_sheets
     if gsheet_id is not None:
@@ -289,6 +313,18 @@ def main():
                        help="箇条書きの影色（例: #000000A0）")
     style.add_argument("--shadow-offset", dest="shadow_offset", default=None, metavar="X,Y",
                        help="影のオフセット（例: 2,2）")
+    style.add_argument("--bullet-line-spacing", dest="bullet_line_spacing", type=float, default=None, metavar="N",
+                       help="箇条書きの行間倍率（デフォルト: 1.7）")
+    style.add_argument("--stroke-width", dest="stroke_width", type=int, default=None, metavar="PX",
+                       help="文字の縁取り幅(px)。0で無効（デフォルト: 0）")
+    style.add_argument("--title-stroke-color", dest="title_stroke_color", default=None, metavar="COLOR",
+                       help="タイトルの縁取り色（例: #000028）")
+    style.add_argument("--bullet-stroke-color", dest="bullet_stroke_color", default=None, metavar="COLOR",
+                       help="箇条書きの縁取り色（例: #000028）")
+    style.add_argument("--title-font-weight", dest="title_font_weight", type=int, default=None, metavar="WGHT",
+                       help="タイトルのフォントウェイト（可変フォントのwght軸。例: 700=Bold）")
+    style.add_argument("--bullet-font-weight", dest="bullet_font_weight", type=int, default=None, metavar="WGHT",
+                       help="箇条書きのフォントウェイト（可変フォントのwght軸。例: 500=Medium）")
 
     # --- Config ---
     parser.add_argument("--config", dest="config_yaml", default=None,
@@ -315,6 +351,12 @@ def main():
         title_shadow=args.title_shadow,
         bullet_shadow=args.bullet_shadow,
         shadow_offset=args.shadow_offset,
+        bullet_line_spacing=args.bullet_line_spacing,
+        stroke_width=args.stroke_width,
+        title_stroke_color=args.title_stroke_color,
+        bullet_stroke_color=args.bullet_stroke_color,
+        title_font_weight=args.title_font_weight,
+        bullet_font_weight=args.bullet_font_weight,
         use_google_sheets=args.use_google_sheets if args.use_google_sheets else None,
         gsheet_id=args.gsheet_id,
         gsheet_sa_json=args.gsheet_sa_json,

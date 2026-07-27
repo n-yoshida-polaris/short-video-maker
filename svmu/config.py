@@ -24,6 +24,15 @@ class AppConfig:
     title_shadow: Tuple[int, int, int, int]
     bullet_shadow: Tuple[int, int, int, int]
     shadow_offset: Tuple[int, int]
+    # Bullet line spacing (multiplier)
+    bullet_line_spacing: float
+    # Stroke (outline)
+    stroke_width: int
+    title_stroke_color: Tuple[int, int, int, int]
+    bullet_stroke_color: Tuple[int, int, int, int]
+    # Font weight (variable font "wght" axis)
+    title_font_weight: Optional[int]
+    bullet_font_weight: Optional[int]
     # Google Sheets
     use_google_sheets: bool
     gsheet_spreadsheet_id: Optional[str]
@@ -62,6 +71,24 @@ def _parse_hex_color(value: Optional[str], default: Tuple[int, int, int, int]) -
         except Exception:
             return default
     return default
+
+
+def _parse_float(value: Optional[str], default: float) -> float:
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def _parse_int(value: Optional[str], default: Optional[int]) -> Optional[int]:
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except Exception:
+        return default
 
 
 def _parse_offset(value: Optional[str], default: Tuple[int, int]) -> Tuple[int, int]:
@@ -109,6 +136,14 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
     default_bullet_shadow = (0, 0, 0, 160)
     default_shadow_offset = (2, 2)
 
+    # Bullet line spacing: default matches render_image module constant
+    default_bullet_line_spacing = 1.7
+
+    # Stroke (outline): defaults match render_image module constants
+    default_stroke_width = 0
+    default_title_stroke_color = (0, 0, 40, 255)
+    default_bullet_stroke_color = (0, 0, 40, 255)
+
     # 設定を返す
     return AppConfig(
         excel_path=get("EXCEL_PATH", "./assets/ideas.xlsx"),
@@ -123,6 +158,12 @@ def load_config(config_yaml_path: Optional[str] = None) -> AppConfig:
         title_shadow=_parse_hex_color(get("TITLE_SHADOW", None), default_title_shadow),
         bullet_shadow=_parse_hex_color(get("BULLET_SHADOW", None), default_bullet_shadow),
         shadow_offset=_parse_offset(get("SHADOW_OFFSET", None), default_shadow_offset),
+        bullet_line_spacing=_parse_float(get("BULLET_LINE_SPACING", None), default_bullet_line_spacing),
+        stroke_width=_parse_int(get("STROKE_WIDTH", None), default_stroke_width),
+        title_stroke_color=_parse_hex_color(get("TITLE_STROKE_COLOR", None), default_title_stroke_color),
+        bullet_stroke_color=_parse_hex_color(get("BULLET_STROKE_COLOR", None), default_bullet_stroke_color),
+        title_font_weight=_parse_int(get("TITLE_FONT_WEIGHT", None), None),
+        bullet_font_weight=_parse_int(get("BULLET_FONT_WEIGHT", None), None),
         use_google_sheets=str_to_bool(str(get("USE_GOOGLE_SHEETS", "false"))),
         gsheet_spreadsheet_id=get("GSHEET_SPREADSHEET_ID", None),
         gsheet_service_account_json=get("GSHEET_SERVICE_ACCOUNT_JSON", None),
